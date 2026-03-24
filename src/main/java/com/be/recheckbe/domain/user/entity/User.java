@@ -21,16 +21,26 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String username; // 사용자 아아디
 
     @Column(nullable = false)
     @JsonIgnore
     private String password;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String name; // 사용자 이름
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role; // user or admin
+
+    @Column(nullable = false)
+    private String phoneNumber; // 전화번호
+
+    @Column(nullable = false)
+    private int studentNumber; // 학번
+
+    // 비밀번호 변경 시 사용하는 메서드
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
