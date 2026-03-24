@@ -1,6 +1,8 @@
 package com.be.recheckbe.domain.auth.controller;
 
 import com.be.recheckbe.domain.auth.dto.CheckUsernameRequest;
+import com.be.recheckbe.domain.auth.dto.LoginRequest;
+import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
 import com.be.recheckbe.domain.auth.service.AuthService;
 import com.be.recheckbe.global.response.BaseResponse;
@@ -25,6 +27,12 @@ public class AuthController {
     public BaseResponse<Void> checkUsername(@RequestBody @Valid CheckUsernameRequest request) {
         authService.checkUsername(request.getUsername());
         return BaseResponse.success(null);
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "로그인")
+    public BaseResponse<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+        return BaseResponse.success(authService.login(request));
     }
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

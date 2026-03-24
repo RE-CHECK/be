@@ -1,5 +1,7 @@
 package com.be.recheckbe.domain.auth.service;
 
+import com.be.recheckbe.domain.auth.dto.LoginRequest;
+import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
 import com.be.recheckbe.domain.auth.exception.AuthErrorCode;
 import com.be.recheckbe.domain.department.entity.Department;
@@ -9,6 +11,7 @@ import com.be.recheckbe.domain.user.entity.User;
 import com.be.recheckbe.domain.user.repository.UserRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
+import com.be.recheckbe.global.jwt.JwtProvider;
 import com.be.recheckbe.global.s3.enums.PathName;
 import com.be.recheckbe.global.s3.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
     private final DepartmentRepository departmentRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final S3Service s3Service;
+    private final JwtProvider jwtProvider;
 
     @Override
     public void checkUsername(String username) {
@@ -61,5 +65,20 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new CustomException(AuthErrorCode.LOGIN_FAIL));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(AuthErrorCode.LOGIN_FAIL);
+        }
+
+        String accessToken = jwtProvider.createAccessToken(user.getId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+
+        return new LoginResponse(accessToken, refreshToken);
     }
 }
