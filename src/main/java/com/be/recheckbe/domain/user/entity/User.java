@@ -48,6 +48,8 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String studentCardImageUrl; // 학생증 사진 이미지 url
 
+    private String refreshToken;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
@@ -59,5 +61,9 @@ public class User extends BaseTimeEntity {
     // 비밀번호 변경 시 사용하는 메서드
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

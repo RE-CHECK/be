@@ -68,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException(AuthErrorCode.LOGIN_FAIL));
@@ -78,6 +79,8 @@ public class AuthServiceImpl implements AuthService {
 
         String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken(user.getId());
+
+        user.updateRefreshToken(refreshToken);
 
         return new LoginResponse(accessToken, refreshToken);
     }
