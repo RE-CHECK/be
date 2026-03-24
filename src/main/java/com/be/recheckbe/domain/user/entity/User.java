@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.user.entity;
 
+import com.be.recheckbe.domain.department.entity.Department;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,6 +44,13 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int studentNumber; // 학번
+
+    @Column(nullable = false)
+    private String studentCardImageUrl; // 학생증 사진 이미지 url
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
