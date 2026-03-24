@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.user.entity;
 
+import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,6 +43,10 @@ public class User extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int studentNumber; // 학번
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Receipt> receipts = new ArrayList<>();
 
     // 비밀번호 변경 시 사용하는 메서드
     public void updatePassword(String encodedPassword) {
