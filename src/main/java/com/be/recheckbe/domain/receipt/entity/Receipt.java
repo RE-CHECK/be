@@ -23,6 +23,7 @@ public class Receipt extends BaseTimeEntity {
     @Column(nullable = false)
     private String imageUrl; // s3 url
 
+    @Column(nullable = false)
     private int paymentAmount; // 소비금액
 
     @ManyToOne(fetch = FetchType.LAZY)
