@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.receipt.controller;
 
+import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
@@ -50,5 +51,13 @@ public class ReceiptController {
     @Operation(summary = "총 누적 소비금액 조회", description = "서비스 내 전체 사용자의 영수증 결제금액 합산을 조회합니다.")
     public BaseResponse<TotalAllPaymentResponse> getTotalAllPaymentAmount() {
         return BaseResponse.success(receiptService.getTotalAllPaymentAmount());
+    }
+
+    @GetMapping("/college-total-payment")
+    @Operation(summary = "단과대별 총 누적 소비금액 조회", description = "로그인한 사용자의 단과대에 속한 전체 사용자의 영수증 결제금액 합산을 조회합니다.")
+    public BaseResponse<CollegeTotalPaymentResponse> getCollegeTotalPaymentAmount(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return BaseResponse.success(receiptService.getCollegeTotalPaymentAmount(userDetails.getId()));
     }
 }

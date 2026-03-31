@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.receipt.service;
 
+import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
@@ -14,4 +15,6 @@ public interface ReceiptService {
     TotalParticipationResponse getTotalParticipationCount();
 
     TotalAllPaymentResponse getTotalAllPaymentAmount();
+
+    CollegeTotalPaymentResponse getCollegeTotalPaymentAmount(Long userId);
 }
