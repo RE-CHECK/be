@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum AuthErrorCode implements BaseErrorCode {
+    USERNAME_ALREADY_EXISTS("AUTH_4000", "이미 사용 중인 아이디입니다.", HttpStatus.CONFLICT),
     LOGIN_FAIL("AUTH_4001", "아이디 또는 비밀번호가 올바르지 않습니다.", HttpStatus.UNAUTHORIZED),
     INVALID_PASSWORD("AUTH_4002", "비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED),
     AUTHENTICATION_NOT_FOUND("AUTH_4003", "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED),
