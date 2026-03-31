@@ -68,7 +68,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Override
     @Transactional(readOnly = true)
     public CollegeTotalPaymentResponse getCollegeTotalPaymentAmount(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdWithCollegeInfo(userId)
                 .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
         College college = user.getDepartment().getCollege();
