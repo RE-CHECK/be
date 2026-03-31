@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.receipt.service;
 
+import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,4 +12,6 @@ public interface ReceiptService {
     TotalPaymentResponse getTotalPaymentAmount(Long userId);
 
     TotalParticipationResponse getTotalParticipationCount();
+
+    TotalAllPaymentResponse getTotalAllPaymentAmount();
 }

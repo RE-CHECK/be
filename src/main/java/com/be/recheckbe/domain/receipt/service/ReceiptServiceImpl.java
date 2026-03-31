@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.receipt.service;
 
+import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
@@ -53,5 +54,12 @@ public class ReceiptServiceImpl implements ReceiptService {
     public TotalParticipationResponse getTotalParticipationCount() {
         int count = receiptRepository.countBy();
         return new TotalParticipationResponse(count);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TotalAllPaymentResponse getTotalAllPaymentAmount() {
+        int total = receiptRepository.sumAllPaymentAmount();
+        return new TotalAllPaymentResponse(total);
     }
 }
