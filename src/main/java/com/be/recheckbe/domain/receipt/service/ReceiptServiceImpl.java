@@ -1,5 +1,7 @@
 package com.be.recheckbe.domain.receipt.service;
 
+import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
+import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
 import com.be.recheckbe.domain.user.entity.User;
@@ -37,5 +39,19 @@ public class ReceiptServiceImpl implements ReceiptService {
         receiptRepository.save(receipt);
 
         return imageUrl;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TotalPaymentResponse getTotalPaymentAmount(Long userId) {
+        int total = receiptRepository.sumPaymentAmountByUserId(userId);
+        return new TotalPaymentResponse(total);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TotalParticipationResponse getTotalParticipationCount() {
+        int count = receiptRepository.countBy();
+        return new TotalParticipationResponse(count);
     }
 }
