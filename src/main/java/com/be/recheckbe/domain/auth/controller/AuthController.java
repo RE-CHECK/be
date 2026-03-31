@@ -1,6 +1,5 @@
 package com.be.recheckbe.domain.auth.controller;
 
-import com.be.recheckbe.domain.auth.dto.CheckUsernameRequest;
 import com.be.recheckbe.domain.auth.dto.LoginRequest;
 import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
@@ -9,8 +8,10 @@ import com.be.recheckbe.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,14 +19,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "인증 API")
+@Validated
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/check-username")
+    @GetMapping("/check-username")
     @Operation(summary = "아이디 중복확인")
-    public BaseResponse<Void> checkUsername(@RequestBody @Valid CheckUsernameRequest request) {
-        authService.checkUsername(request.getUsername());
+    public BaseResponse<Void> checkUsername(@RequestParam @NotBlank String username) {
+        authService.checkUsername(username);
         return BaseResponse.success(null);
     }
 
