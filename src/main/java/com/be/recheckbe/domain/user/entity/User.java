@@ -39,19 +39,19 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // user or admin
 
-    @Column(nullable = false)
+    @Column
     private String phoneNumber; // 전화번호
 
-    @Column(nullable = false)
-    private int studentNumber; // 학번
+    @Column
+    private Integer studentNumber; // 학번
 
-    @Column(nullable = false)
+    @Column
     private String studentCardImageUrl; // 학생증 사진 이미지 url
 
     private String refreshToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
+    @JoinColumn(name = "department_id")
     private Department department;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

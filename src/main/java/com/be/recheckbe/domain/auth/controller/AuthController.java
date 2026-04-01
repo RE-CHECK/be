@@ -32,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "로그인")
+    @Operation(summary = "로그인 (사용자, 관리자 모두 사용)")
     public BaseResponse<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return BaseResponse.success(authService.login(request));
     }

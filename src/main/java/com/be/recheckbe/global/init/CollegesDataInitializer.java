@@ -15,7 +15,8 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class DataInitializer implements ApplicationRunner {
+@org.springframework.core.annotation.Order(1) // 스프링 빈 실행순서 첫번째
+public class CollegesDataInitializer implements ApplicationRunner {
 
     private final CollegeRepository collegeRepository;
     private final DepartmentRepository departmentRepository;
