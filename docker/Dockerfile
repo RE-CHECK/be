@@ -29,5 +29,8 @@ WORKDIR /app
 # 빌드 스테이지에서 생성된 JAR파일만 런타임 이미지로 가져옴
 COPY --from=build /app/build/libs/*.jar app.jar
 
+# 포트 문서화
+EXPOSE 8080
+
 # 컨테이너 시작 시 실행할 명령어 (Spring Boot 어플리케이션 실행)
 ENTRYPOINT ["java", "-jar", "app.jar"]
