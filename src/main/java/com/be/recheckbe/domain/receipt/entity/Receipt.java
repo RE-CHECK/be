@@ -26,6 +26,9 @@ public class Receipt extends BaseTimeEntity {
     @Column(nullable = false)
     private int paymentAmount; // 소비금액
 
+    @Column
+    private Integer weekNumber; // 주차 (1, 2, 3 / null = 테스트 주간)
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
