@@ -34,8 +34,10 @@ public class ReceiptServiceImpl implements ReceiptService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
-        String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
+        // ocr 호출
         int paymentAmount = ocrService.extractPaymentAmount(image);
+        // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
+        String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
         Receipt receipt = Receipt.builder()
                 .imageUrl(imageUrl)
