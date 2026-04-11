@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.user.entity;
 
+import com.be.recheckbe.domain.department.entity.Department;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.global.common.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,11 +39,20 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // user or admin
 
-    @Column(nullable = false)
+    @Column
     private String phoneNumber; // 전화번호
 
-    @Column(nullable = false)
-    private int studentNumber; // 학번
+    @Column
+    private Integer studentNumber; // 학번
+
+    @Column
+    private String studentCardImageUrl; // 학생증 사진 이미지 url
+
+    private String refreshToken;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -51,5 +61,9 @@ public class User extends BaseTimeEntity {
     // 비밀번호 변경 시 사용하는 메서드
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
