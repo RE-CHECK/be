@@ -37,3 +37,7 @@ src/main/resources/*.yml
 
 ### VS Code ###
 .vscode/
+
+### Claude Code ###
+CLAUDE.md
+CLAUDE.md

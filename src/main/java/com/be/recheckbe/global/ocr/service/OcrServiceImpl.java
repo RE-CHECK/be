@@ -1,0 +1,112 @@
+package com.be.recheckbe.global.ocr.service;
+
+import com.be.recheckbe.global.exception.CustomException;
+import com.be.recheckbe.global.ocr.config.OcrConfig;
+import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
+import com.be.recheckbe.global.ocr.dto.OcrRequest;
+import com.be.recheckbe.global.ocr.dto.OcrResponse;
+import com.be.recheckbe.global.ocr.exception.OcrErrorCode;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class OcrServiceImpl implements OcrService {
+
+    private final RestTemplate restTemplate;
+    private final OcrConfig ocrConfig;
+
+    @Override
+    public int extractPaymentAmount(MultipartFile file) {
+        String base64Image = encodeToBase64(file);
+        String format = extractFormat(file.getOriginalFilename());
+
+        OcrRequest request = OcrRequest.builder()
+                .version("V2")
+                .requestId(UUID.randomUUID().toString())
+                .timestamp(System.currentTimeMillis())
+                .images(List.of(
+                        OcrImageRequest.builder()
+                                .format(format)
+                                .data(base64Image)
+                                .name("receipt")
+                                .build()
+                ))
+                .build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-OCR-SECRET", ocrConfig.getSecretKey());
+
+        OcrResponse response;
+        try {
+            response = restTemplate.postForObject(
+                    ocrConfig.getApiUrl(),
+                    new HttpEntity<>(request, headers),
+                    OcrResponse.class
+            );
+        } catch (RestClientException e) {
+            log.error("OCR API 요청 실패: {}", e.getMessage());
+            throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+        }
+
+        return parsePaymentAmount(response);
+    }
+
+    private String encodeToBase64(MultipartFile file) {
+        try {
+            return Base64.getEncoder().encodeToString(file.getBytes());
+        } catch (IOException e) {
+            log.error("이미지 Base64 인코딩 실패: {}", e.getMessage());
+            throw new CustomException(OcrErrorCode.OCR_IMAGE_ENCODE_FAILED);
+        }
+    }
+
+    private String extractFormat(String originalFilename) {
+        if (originalFilename == null || !originalFilename.contains(".")) {
+            return "jpg";
+        }
+        return originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+    private int parsePaymentAmount(OcrResponse response) {
+        if (response == null || response.getImages() == null || response.getImages().isEmpty()) {
+            throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+        }
+
+        OcrResponse.ImageResult imageResult = response.getImages().get(0);
+
+        if (!"SUCCESS".equals(imageResult.getInferResult())) {
+            log.warn("OCR 인식 결과: {}", imageResult.getInferResult());
+            throw new CustomException(OcrErrorCode.OCR_INFER_FAILED);
+        }
+
+        try {
+            String value = imageResult.getReceipt()
+                    .getResult()
+                    .getPaymentInfo()
+                    .getPrice()
+                    .getTotalPrice()
+                    .getFormatted()
+                    .getValue();
+
+            return Integer.parseInt(value);
+        } catch (NullPointerException | NumberFormatException e) {
+            log.warn("결제금액 추출 실패: {}", e.getMessage());
+            throw new CustomException(OcrErrorCode.OCR_PAYMENT_NOT_FOUND);
+        }
+    }
+}
