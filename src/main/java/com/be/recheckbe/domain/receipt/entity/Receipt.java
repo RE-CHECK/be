@@ -26,6 +26,15 @@ public class Receipt extends BaseTimeEntity {
     @Column(nullable = false)
     private int paymentAmount; // 소비금액
 
+    @Column//(nullable = false)
+    private String cardCompany; // 카드사
+
+    @Column//(nullable = false)
+    private int confirmNum; // 영수증 승인번호
+
+    @Column//(nullable = false)
+    private String storeName; // 점포 이름
+
     @Column
     private Integer weekNumber; // 주차 (1, 2, 3 / null = 테스트 주간)
 
