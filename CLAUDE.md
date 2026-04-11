@@ -107,6 +107,12 @@ Controller → Service (Interface + Impl) → Repository → Entity
 ✅ Test    테스트
 🔧 Chore   빌드/설정
 ```
+- 별도의 수정 사항은 README.md 파일을 참고하여 커밋 메세지 컨벤션을 지킵니다.
+
+### Github Convention
+- pr과 issue 생성은 각 템플릿 형식에 맞게 컨벤션을 지켜서 생성합니다.
+- 코드 수정이 완료되면 수정 완료된 코드들은 develop 브랜치로 pr을 생성합니다. 
+- pr 생성 시 외부에 노출되면 안되는 정보들은 pr에 적지 않고 검토사항에 확인을 요망한다고 표시합니다.
 
 ---
 
