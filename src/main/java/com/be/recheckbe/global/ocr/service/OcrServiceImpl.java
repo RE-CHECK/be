@@ -2,6 +2,7 @@ package com.be.recheckbe.global.ocr.service;
 
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.ocr.config.OcrConfig;
+import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
 import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
 import com.be.recheckbe.global.ocr.dto.OcrRequest;
 import com.be.recheckbe.global.ocr.dto.OcrResponse;
@@ -30,7 +31,7 @@ public class OcrServiceImpl implements OcrService {
     private final OcrConfig ocrConfig;
 
     @Override
-    public int extractPaymentAmount(MultipartFile file) {
+    public OcrExtractedData extractReceiptData(MultipartFile file) {
         String base64Image = encodeToBase64(file);
         String format = extractFormat(file.getOriginalFilename());
 
@@ -63,7 +64,7 @@ public class OcrServiceImpl implements OcrService {
             throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
         }
 
-        return parsePaymentAmount(response);
+        return parseReceiptData(response);
     }
 
     private String encodeToBase64(MultipartFile file) {
@@ -82,7 +83,7 @@ public class OcrServiceImpl implements OcrService {
         return originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
     }
 
-    private int parsePaymentAmount(OcrResponse response) {
+    private OcrExtractedData parseReceiptData(OcrResponse response) {
         if (response == null || response.getImages() == null || response.getImages().isEmpty()) {
             throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
         }
@@ -94,19 +95,62 @@ public class OcrServiceImpl implements OcrService {
             throw new CustomException(OcrErrorCode.OCR_INFER_FAILED);
         }
 
-        try {
-            String value = imageResult.getReceipt()
-                    .getResult()
-                    .getPaymentInfo()
-                    .getPrice()
-                    .getTotalPrice()
-                    .getFormatted()
-                    .getValue();
+        OcrResponse.ReceiptResult result = imageResult.getReceipt().getResult();
 
-            return Integer.parseInt(value);
-        } catch (NullPointerException | NumberFormatException e) {
-            log.warn("결제금액 추출 실패: {}", e.getMessage());
+        int paymentAmount = parsePaymentAmount(result);
+        String storeName = extractText(result.getStoreInfo(), OcrResponse.StoreInfo::getName);
+        String cardCompany = extractCardCompany(result);
+        String confirmNum = extractConfirmNum(result);
+
+        return OcrExtractedData.builder()
+                .storeName(storeName)
+                .paymentAmount(paymentAmount)
+                .cardCompany(cardCompany)
+                .confirmNum(confirmNum)
+                .build();
+    }
+
+    private int parsePaymentAmount(OcrResponse.ReceiptResult result) {
+        String text = null;
+        try {
+            text = result.getTotalPrice().getPrice().getText();
+        } catch (NullPointerException e) {
+            // totalPrice 또는 price 필드 없음
+        }
+
+        if (text == null || text.isBlank()) {
+            log.warn("결제금액 추출 실패: totalPrice.price.text가 null");
             throw new CustomException(OcrErrorCode.OCR_PAYMENT_NOT_FOUND);
+        }
+
+        try {
+            return Integer.parseInt(text.replaceAll("[^0-9]", ""));
+        } catch (NumberFormatException e) {
+            log.warn("결제금액 파싱 실패: text={}", text);
+            throw new CustomException(OcrErrorCode.OCR_PAYMENT_NOT_FOUND);
+        }
+    }
+
+    private <T> String extractText(T obj, java.util.function.Function<T, OcrResponse.TextField> fieldExtractor) {
+        if (obj == null) return null;
+        OcrResponse.TextField textField = fieldExtractor.apply(obj);
+        if (textField == null) return null;
+        return textField.getText();
+    }
+
+    private String extractCardCompany(OcrResponse.ReceiptResult result) {
+        try {
+            return result.getPaymentInfo().getCardInfo().getCompany().getText();
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    private String extractConfirmNum(OcrResponse.ReceiptResult result) {
+        try {
+            return result.getPaymentInfo().getConfirmNum().getText();
+        } catch (NullPointerException e) {
+            return null;
         }
     }
 }

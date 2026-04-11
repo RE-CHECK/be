@@ -32,27 +32,44 @@ public class OcrResponse {
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ReceiptResult {
+        private StoreInfo storeInfo;
         private PaymentInfo paymentInfo;
+        private TotalPriceWrapper totalPrice;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class StoreInfo {
+        private TextField name;
     }
 
     @Getter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PaymentInfo {
-        private PriceInfo price;
+        private CardInfo cardInfo;
+        private TextField confirmNum;
     }
 
     @Getter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PriceInfo {
-        private PriceField totalPrice;
+    public static class CardInfo {
+        private TextField company;
     }
 
     @Getter
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PriceField {
+    public static class TotalPriceWrapper {
+        private TextField price;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class TextField {
         private String text;
         private FormattedValue formatted;
     }

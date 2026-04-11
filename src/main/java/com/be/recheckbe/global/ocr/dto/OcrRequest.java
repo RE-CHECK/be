@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class OcrRequest {
 
-    private String version;
-    private String requestId;
-    private long timestamp;
+    private String version; // V2만 사용
+    private String requestId; // UUID
+    private long timestamp; // api 호출 시각
     private List<OcrImageRequest> images;
 }

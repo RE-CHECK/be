@@ -1,8 +1,9 @@
 package com.be.recheckbe.global.ocr.service;
 
+import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface OcrService {
 
-    int extractPaymentAmount(MultipartFile file);
+    OcrExtractedData extractReceiptData(MultipartFile file);
 }
