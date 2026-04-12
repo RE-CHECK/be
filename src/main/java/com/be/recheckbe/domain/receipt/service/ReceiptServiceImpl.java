@@ -10,6 +10,7 @@ import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
 import com.be.recheckbe.domain.user.entity.User;
 import com.be.recheckbe.domain.user.repository.UserRepository;
+import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
@@ -38,6 +39,13 @@ public class ReceiptServiceImpl implements ReceiptService {
 
         // ocr 호출
         OcrExtractedData ocrData = ocrService.extractReceiptData(image);
+
+        // 국민카드 영수증만 허용
+        String cardCompany = ocrData.getCardCompany();
+        if (cardCompany == null || !cardCompany.contains("국민카드")) {
+            throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
+        }
+
         // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
         String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
