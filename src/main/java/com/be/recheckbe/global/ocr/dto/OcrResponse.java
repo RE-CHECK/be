@@ -71,13 +71,5 @@ public class OcrResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TextField {
         private String text;
-        private FormattedValue formatted;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class FormattedValue {
-        private String value;
     }
 }
