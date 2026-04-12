@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ReceiptServiceImpl implements ReceiptService {
 
+    private static final String SUPPORTED_CARD_COMPANY = "국민카드";
+
     private final S3Service s3Service;
     private final OcrService ocrService;
     private final ReceiptRepository receiptRepository;
@@ -34,15 +36,14 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Override
     @Transactional
     public UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+        User user = userRepository.getReferenceById(userId);
 
         // ocr 호출
         OcrExtractedData ocrData = ocrService.extractReceiptData(image);
 
         // 국민카드 영수증만 허용
         String cardCompany = ocrData.getCardCompany();
-        if (cardCompany == null || !cardCompany.contains("국민카드")) {
+        if (cardCompany == null || !cardCompany.contains(SUPPORTED_CARD_COMPANY)) {
             throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
         }
 
@@ -53,7 +54,7 @@ public class ReceiptServiceImpl implements ReceiptService {
                 .imageUrl(imageUrl)
                 .paymentAmount(ocrData.getPaymentAmount())
                 .storeName(ocrData.getStoreName())
-                .cardCompany(ocrData.getCardCompany())
+                .cardCompany(cardCompany)
                 .confirmNum(parseConfirmNum(ocrData.getConfirmNum()))
                 .user(user)
                 .build();
