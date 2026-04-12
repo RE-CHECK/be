@@ -4,6 +4,7 @@ import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
+import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.service.ReceiptService;
 import com.be.recheckbe.global.response.BaseResponse;
 import com.be.recheckbe.global.security.CustomUserDetails;
@@ -25,12 +26,11 @@ public class ReceiptController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "영수증 이미지 업로드", description = "영수증 이미지를 S3에 업로드합니다.")
-    public BaseResponse<String> uploadReceiptImage(
+    public BaseResponse<UploadReceiptResponse> uploadReceiptImage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("image") MultipartFile image
     ) {
-        String imageUrl = receiptService.uploadReceiptImage(userDetails.getId(), image);
-        return BaseResponse.success(imageUrl);
+        return BaseResponse.success(receiptService.uploadReceiptImage(userDetails.getId(), image));
     }
 
     @GetMapping("/total-user-payment")

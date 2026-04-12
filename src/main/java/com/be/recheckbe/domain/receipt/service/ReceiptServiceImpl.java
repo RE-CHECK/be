@@ -4,6 +4,7 @@ import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
+import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.college.entity.College;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
@@ -31,7 +32,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Override
     @Transactional
-    public String uploadReceiptImage(Long userId, MultipartFile image) {
+    public UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
@@ -51,7 +52,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
         receiptRepository.save(receipt);
 
-        return imageUrl;
+        return UploadReceiptResponse.of(imageUrl, ocrData);
     }
 
     private int parseConfirmNum(String confirmNum) {

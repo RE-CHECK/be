@@ -4,11 +4,12 @@ import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
+import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ReceiptService {
 
-    String uploadReceiptImage(Long userId, MultipartFile image);
+    UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image);
 
     TotalPaymentResponse getTotalPaymentAmount(Long userId);
 
