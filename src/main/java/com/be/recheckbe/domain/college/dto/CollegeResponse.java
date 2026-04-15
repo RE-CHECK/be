@@ -6,15 +6,15 @@ import lombok.Getter;
 @Getter
 public class CollegeResponse {
 
-    private final Long id;
-    private final String name;
+  private final Long id;
+  private final String name;
 
-    private CollegeResponse(College college) {
-        this.id = college.getId();
-        this.name = college.getName();
-    }
+  private CollegeResponse(College college) {
+    this.id = college.getId();
+    this.name = college.getName();
+  }
 
-    public static CollegeResponse from(College college) {
-        return new CollegeResponse(college);
-    }
+  public static CollegeResponse from(College college) {
+    return new CollegeResponse(college);
+  }
 }

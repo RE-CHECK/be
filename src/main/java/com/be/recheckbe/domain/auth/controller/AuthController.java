@@ -22,28 +22,27 @@ import org.springframework.web.multipart.MultipartFile;
 @Validated
 public class AuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @GetMapping("/check-username")
-    @Operation(summary = "아이디 중복확인")
-    public BaseResponse<Void> checkUsername(@RequestParam @NotBlank String username) {
-        authService.checkUsername(username);
-        return BaseResponse.success(null);
-    }
+  @GetMapping("/check-username")
+  @Operation(summary = "아이디 중복확인")
+  public BaseResponse<Void> checkUsername(@RequestParam @NotBlank String username) {
+    authService.checkUsername(username);
+    return BaseResponse.success(null);
+  }
 
-    @PostMapping("/login")
-    @Operation(summary = "로그인 (사용자, 관리자 모두 사용)")
-    public BaseResponse<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
-        return BaseResponse.success(authService.login(request));
-    }
+  @PostMapping("/login")
+  @Operation(summary = "로그인 (사용자, 관리자 모두 사용)")
+  public BaseResponse<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+    return BaseResponse.success(authService.login(request));
+  }
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "회원가입")
-    public BaseResponse<Void> register(
-            @RequestPart("request") @Valid RegisterRequest request,
-            @RequestPart("studentCardImage") MultipartFile studentCardImage
-    ) {
-        authService.register(request, studentCardImage);
-        return BaseResponse.success(null);
-    }
+  @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "회원가입")
+  public BaseResponse<Void> register(
+      @RequestPart("request") @Valid RegisterRequest request,
+      @RequestPart("studentCardImage") MultipartFile studentCardImage) {
+    authService.register(request, studentCardImage);
+    return BaseResponse.success(null);
+  }
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CollegeTotalPaymentResponse {
 
-    private Long collegeId;
-    private String collegeName;
-    private int totalPaymentAmount;
+  private Long collegeId;
+  private String collegeName;
+  private int totalPaymentAmount;
 }

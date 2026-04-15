@@ -18,34 +18,40 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig implements WebMvcConfigurer {
 
-    @Autowired private UrlBasedCorsConfigurationSource corsConfigurationSource;
-    @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @Autowired private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  @Autowired private UrlBasedCorsConfigurationSource corsConfigurationSource;
+  @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
+  @Autowired private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/colleges/**").permitAll()
-                        .requestMatchers("/api/receipts/total-participation").permitAll()
-                        .requestMatchers("/api/receipts/total-all-payment").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    return http.csrf(AbstractHttpConfigurer::disable)
+        .cors(cors -> cors.configurationSource(corsConfigurationSource))
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/api/auth/**")
+                    .permitAll()
+                    .requestMatchers("/api/colleges/**")
+                    .permitAll()
+                    .requestMatchers("/api/receipts/total-participation")
+                    .permitAll()
+                    .requestMatchers("/api/receipts/total-all-payment")
+                    .permitAll()
+                    .requestMatchers("/api/admin/**")
+                    .hasAuthority("ADMIN")
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .exceptionHandling(
+            exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
 }

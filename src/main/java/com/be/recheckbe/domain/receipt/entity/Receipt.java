@@ -16,29 +16,28 @@ import lombok.NoArgsConstructor;
 @Table(name = "receipts")
 public class Receipt extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String imageUrl; // s3 url
+  @Column(nullable = false)
+  private String imageUrl; // s3 url
 
-    @Column(nullable = false)
-    private int paymentAmount; // 소비금액
+  @Column(nullable = false)
+  private int paymentAmount; // 소비금액
 
-    @Column//(nullable = false)
-    private String cardCompany; // 카드사
+  @Column // (nullable = false)
+  private String cardCompany; // 카드사
 
-    @Column//(nullable = false)
-    private int confirmNum; // 영수증 승인번호
+  @Column // (nullable = false)
+  private int confirmNum; // 영수증 승인번호
 
-    @Column//(nullable = false)
-    private String storeName; // 점포 이름
+  @Column // (nullable = false)
+  private String storeName; // 점포 이름
 
-    @Column
-    private Integer weekNumber; // 주차 (1, 2, 3 / null = 테스트 주간)
+  @Column private Integer weekNumber; // 주차 (1, 2, 3 / null = 테스트 주간)
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 }

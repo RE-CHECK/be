@@ -7,9 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthService {
 
-    void checkUsername(String username);
+  void checkUsername(String username);
 
-    void register(RegisterRequest request, MultipartFile studentCardImage);
+  void register(RegisterRequest request, MultipartFile studentCardImage);
 
-    LoginResponse login(LoginRequest request);
+  LoginResponse login(LoginRequest request);
 }

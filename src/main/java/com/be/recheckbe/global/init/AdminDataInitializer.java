@@ -16,21 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(2) // 스프링 빈 실행 순서 두번째
 public class AdminDataInitializer implements ApplicationRunner {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
-    @Override
-    @Transactional
-    public void run(ApplicationArguments args) {
-        if (userRepository.existsByUsername("admin")) return;
+  @Override
+  @Transactional
+  public void run(ApplicationArguments args) {
+    if (userRepository.existsByUsername("admin")) return;
 
-        User admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("1234"))
-                .name("관리자")
-                .role(Role.ADMIN)
-                .build();
+    User admin =
+        User.builder()
+            .username("admin")
+            .password(passwordEncoder.encode("1234"))
+            .name("관리자")
+            .role(Role.ADMIN)
+            .build();
 
-        userRepository.save(admin);
-    }
+    userRepository.save(admin);
+  }
 }

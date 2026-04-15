@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface OcrService {
 
-    OcrExtractedData extractReceiptData(MultipartFile file);
+  OcrExtractedData extractReceiptData(MultipartFile file);
 }
