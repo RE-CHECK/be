@@ -29,13 +29,17 @@ public class AdminController {
   }
 
   @GetMapping("/users/csv")
-  @Operation(summary = "유저 가입 정보 CSV 다운로드", description = "가입일시, 유저 ID, 단과대, 학과 정보를 CSV로 다운로드합니다. (관리자 전용)")
+  @Operation(
+      summary = "유저 가입 정보 CSV 다운로드",
+      description = "가입일시, 유저 ID, 단과대, 학과 정보를 CSV로 다운로드합니다. (관리자 전용)")
   public void downloadUsersCsv(HttpServletResponse response) throws IOException {
     adminUserService.downloadUsersCsv(response);
   }
 
   @GetMapping("/receipts/csv")
-  @Operation(summary = "단과대별 소비금액 CSV 다운로드", description = "일자별 단과대 소비금액 합계를 CSV로 다운로드합니다. (관리자 전용)")
+  @Operation(
+      summary = "단과대별 소비금액 CSV 다운로드",
+      description = "일자별 단과대 소비금액 합계를 CSV로 다운로드합니다. (관리자 전용)")
   public void downloadCollegePaymentCsv(HttpServletResponse response) throws IOException {
     adminReceiptService.downloadCollegePaymentCsv(response);
   }

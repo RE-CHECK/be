@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   long countByRoleAndCreatedAtBetween(Role role, LocalDateTime start, LocalDateTime end);
 
-  @Query("SELECT u FROM User u JOIN FETCH u.department d JOIN FETCH d.college WHERE u.role = :role ORDER BY u.createdAt ASC")
+  @Query(
+      "SELECT u FROM User u JOIN FETCH u.department d JOIN FETCH d.college WHERE u.role = :role ORDER BY u.createdAt ASC")
   List<User> findAllByRoleWithDepartmentAndCollege(@Param("role") Role role);
 }

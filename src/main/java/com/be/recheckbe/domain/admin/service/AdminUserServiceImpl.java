@@ -30,8 +30,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
     LocalDateTime endOfToday = startOfToday.plusDays(1);
 
-    long todayCount = userRepository.countByRoleAndCreatedAtBetween(
-        Role.USER, startOfToday, endOfToday);
+    long todayCount =
+        userRepository.countByRoleAndCreatedAtBetween(Role.USER, startOfToday, endOfToday);
     long totalCount = userRepository.countByRole(Role.USER);
 
     return new UserRegistrationStatsResponse(todayCount, totalCount);
@@ -54,9 +54,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     List<User> users = userRepository.findAllByRoleWithDepartmentAndCollege(Role.USER);
     for (User user : users) {
-      String createdAt = user.getCreatedAt() != null
-          ? user.getCreatedAt().format(DATE_TIME_FORMATTER)
-          : "";
+      String createdAt =
+          user.getCreatedAt() != null ? user.getCreatedAt().format(DATE_TIME_FORMATTER) : "";
       String username = escape(user.getUsername());
       String college = escape(user.getDepartment().getCollege().getName());
       String department = escape(user.getDepartment().getName());
