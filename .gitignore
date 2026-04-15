@@ -37,3 +37,9 @@ src/main/resources/*.yml
 
 ### VS Code ###
 .vscode/
+
+### Claude Code ###
+CLAUDE.md
+
+### Environment ###
+docker/.env
