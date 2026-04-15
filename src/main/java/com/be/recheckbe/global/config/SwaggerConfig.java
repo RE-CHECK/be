@@ -22,7 +22,7 @@ public class SwaggerConfig {
     localServer.setDescription("🛠️ 로컬 서버");
 
     Server prodServer = new Server();
-    prodServer.setUrl("");
+    prodServer.setUrl("http://52.78.121.108:8080");
     prodServer.setDescription("🚀 운영 서버");
 
     return new OpenAPI()
