@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "departments")
 public class Department extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String name; // 학과 이름
+  @Column(nullable = false)
+  private String name; // 학과 이름
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id", nullable = false)
-    private College college;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "college_id", nullable = false)
+  private College college;
 }

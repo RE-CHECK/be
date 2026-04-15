@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TotalAllPaymentResponse {
 
-    private int totalAllPaymentAmount;
+  private int totalAllPaymentAmount;
 }

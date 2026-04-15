@@ -10,14 +10,14 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class OcrConfig {
 
-    @Value("${naver.ocr.secret-key}")
-    private String secretKey;
+  @Value("${naver.ocr.secret-key}")
+  private String secretKey;
 
-    @Value("${naver.ocr.api-url}")
-    private String apiUrl;
+  @Value("${naver.ocr.api-url}")
+  private String apiUrl;
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 }

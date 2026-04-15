@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TotalParticipationResponse {
 
-    private int totalParticipationCount;
+  private int totalParticipationCount;
 }

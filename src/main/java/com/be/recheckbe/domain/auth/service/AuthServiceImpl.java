@@ -24,64 +24,69 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
-    private final DepartmentRepository departmentRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final S3Service s3Service;
-    private final JwtProvider jwtProvider;
+  private final UserRepository userRepository;
+  private final DepartmentRepository departmentRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
+  private final S3Service s3Service;
+  private final JwtProvider jwtProvider;
 
-    @Override
-    public void checkUsername(String username) {
-        if (userRepository.existsByUsername(username)) {
-            throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
-        }
+  @Override
+  public void checkUsername(String username) {
+    if (userRepository.existsByUsername(username)) {
+      throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
+    }
+  }
+
+  @Override
+  @Transactional
+  public void register(RegisterRequest request, MultipartFile studentCardImage) {
+    if (userRepository.existsByUsername(request.getUsername())) {
+      throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
     }
 
-    @Override
-    @Transactional
-    public void register(RegisterRequest request, MultipartFile studentCardImage) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
-        }
-
-        if (!request.getPassword().equals(request.getPasswordConfirm())) {
-            throw new CustomException(AuthErrorCode.INVALID_PASSWORD);
-        }
-
-        Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
-
-        String studentCardImageUrl = s3Service.uploadFile(PathName.STUDENT_CARD, studentCardImage);
-
-        User user = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
-                .studentNumber(request.getStudentNumber())
-                .role(Role.USER)
-                .department(department)
-                .studentCardImageUrl(studentCardImageUrl)
-                .build();
-
-        userRepository.save(user);
+    if (!request.getPassword().equals(request.getPasswordConfirm())) {
+      throw new CustomException(AuthErrorCode.INVALID_PASSWORD);
     }
 
-    @Override
-    @Transactional
-    public LoginResponse login(LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new CustomException(AuthErrorCode.LOGIN_FAIL));
+    Department department =
+        departmentRepository
+            .findById(request.getDepartmentId())
+            .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new CustomException(AuthErrorCode.LOGIN_FAIL);
-        }
+    String studentCardImageUrl = s3Service.uploadFile(PathName.STUDENT_CARD, studentCardImage);
 
-        String accessToken = jwtProvider.createAccessToken(user.getId());
-        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+    User user =
+        User.builder()
+            .username(request.getUsername())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .name(request.getName())
+            .phoneNumber(request.getPhoneNumber())
+            .studentNumber(request.getStudentNumber())
+            .role(Role.USER)
+            .department(department)
+            .studentCardImageUrl(studentCardImageUrl)
+            .build();
 
-        user.updateRefreshToken(refreshToken);
+    userRepository.save(user);
+  }
 
-        return new LoginResponse(accessToken, refreshToken);
+  @Override
+  @Transactional
+  public LoginResponse login(LoginRequest request) {
+    User user =
+        userRepository
+            .findByUsername(request.getUsername())
+            .orElseThrow(() -> new CustomException(AuthErrorCode.LOGIN_FAIL));
+
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      throw new CustomException(AuthErrorCode.LOGIN_FAIL);
     }
+
+    String accessToken = jwtProvider.createAccessToken(user.getId());
+    String refreshToken = jwtProvider.createRefreshToken(user.getId());
+
+    user.updateRefreshToken(refreshToken);
+
+    return new LoginResponse(accessToken, refreshToken);
+  }
 }

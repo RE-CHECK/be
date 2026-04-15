@@ -7,8 +7,8 @@ import lombok.Getter;
 @Builder
 public class OcrExtractedData {
 
-    private String storeName;    // storeInfo.name.text
-    private int paymentAmount;   // totalPrice.price.text
-    private String cardCompany;  // paymentInfo.cardInfo.company.text (nullable)
-    private String confirmNum;   // paymentInfo.confirmNum.text (nullable)
+  private String storeName; // storeInfo.name.text
+  private int paymentAmount; // totalPrice.price.text
+  private String cardCompany; // paymentInfo.cardInfo.company.text (nullable)
+  private String confirmNum; // paymentInfo.confirmNum.text (nullable)
 }

@@ -11,5 +11,4 @@ public class RecheckBeApplication {
   public static void main(String[] args) {
     SpringApplication.run(RecheckBeApplication.class, args);
   }
-
 }

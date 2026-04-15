@@ -9,13 +9,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ReceiptService {
 
-    UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image);
+  UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image);
 
-    TotalPaymentResponse getTotalPaymentAmount(Long userId);
+  TotalPaymentResponse getTotalPaymentAmount(Long userId);
 
-    TotalParticipationResponse getTotalParticipationCount();
+  TotalParticipationResponse getTotalParticipationCount();
 
-    TotalAllPaymentResponse getTotalAllPaymentAmount();
+  TotalAllPaymentResponse getTotalAllPaymentAmount();
 
-    CollegeTotalPaymentResponse getCollegeTotalPaymentAmount(Long userId);
+  CollegeTotalPaymentResponse getCollegeTotalPaymentAmount(Long userId);
 }

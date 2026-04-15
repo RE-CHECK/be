@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PathName {
-    RECEIPT("receipt"),
-    STUDENT_CARD("studentCard");
+  RECEIPT("receipt"),
+  STUDENT_CARD("studentCard");
 
-    private final String path;
+  private final String path;
 }
