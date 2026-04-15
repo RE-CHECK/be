@@ -40,3 +40,6 @@ src/main/resources/*.yml
 
 ### Claude Code ###
 CLAUDE.md
+
+### Environment ###
+docker/.env
