@@ -17,7 +17,7 @@ services:
   app:
     image: ${DOCKER_USERNAME}/${DOCKER_REPO}:latest
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8080:8080" # 추후에 nginx로만 접속하도록 127.0.0.1:8080:8080로 변경
     environment:
       SPRING_PROFILES_ACTIVE: prod
       DB_HOST: db
