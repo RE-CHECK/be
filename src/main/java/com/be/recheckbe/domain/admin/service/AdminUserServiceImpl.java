@@ -50,7 +50,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     writer.write('\uFEFF');
 
     // 헤더
-    writer.println("\"가입일시\",\"userId\",\"사용자명\",\"단과대\",\"학과\",\"이름\",\"학번\",\"전화번호\"");
+    writer.println(
+        "\"가입일시\",\"userId\",\"사용자명\",\"단과대\",\"학과\",\"이름\",\"학번\",\"전화번호\",\"학생증 이미지 URL\"");
 
     List<User> users = userRepository.findAllByRoleWithDepartmentAndCollege(Role.USER);
     for (User user : users) {
@@ -63,10 +64,19 @@ public class AdminUserServiceImpl implements AdminUserService {
       String name = escape(user.getName());
       String studentNum = escape(String.valueOf(user.getStudentNumber()));
       String phoneNum = escape(String.valueOf(user.getPhoneNumber()));
+      String studentCardImageUrl = escape(user.getStudentCardImageUrl());
 
       writer.printf(
-          "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
-          createdAt, id, username, college, department, name, studentNum, phoneNum);
+          "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
+          createdAt,
+          id,
+          username,
+          college,
+          department,
+          name,
+          studentNum,
+          phoneNum,
+          studentCardImageUrl);
     }
 
     writer.flush();
