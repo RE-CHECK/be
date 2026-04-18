@@ -4,6 +4,8 @@ import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
+import com.be.recheckbe.domain.receipt.dto.Week2RankingGroupResponse;
+import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ReceiptService {
@@ -15,4 +17,6 @@ public interface ReceiptService {
   TotalAllPaymentResponse getTotalAllPaymentAmount();
 
   CollegeTotalPaymentResponse getCollegeTotalPaymentAmount(Long userId);
+
+  List<Week2RankingGroupResponse> getWeek2Ranking();
 }

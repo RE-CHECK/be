@@ -31,4 +31,35 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
           + "GROUP BY FUNCTION('TO_CHAR', r.createdAt, 'YYYY-MM-DD'), c.id, c.name "
           + "ORDER BY FUNCTION('TO_CHAR', r.createdAt, 'YYYY-MM-DD') ASC, c.name ASC")
   List<Object[]> findDailyPaymentAmountByCollege(); // 일자별 단과대 소비금액 집계
+
+  @Query(
+      "SELECT c.name, SUM(r.paymentAmount) "
+          + "FROM Receipt r "
+          + "JOIN r.user u "
+          + "JOIN u.department d "
+          + "JOIN d.college c "
+          + "WHERE r.weekNumber = 2 "
+          + "AND r.storeName = :storeName "
+          + "AND c.name IN :collegeNames "
+          + "GROUP BY u.id, c.id, c.name "
+          + "ORDER BY SUM(r.paymentAmount) DESC, MIN(u.createdAt) ASC")
+  List<Object[]> findWeek2RankingByColleges(
+      @Param("storeName") String storeName,
+      @Param("collegeNames") List<String> collegeNames); // 2주차 단과대별 사용자 랭킹
+
+  @Query(
+      "SELECT c.name, d.name, SUM(r.paymentAmount) "
+          + "FROM Receipt r "
+          + "JOIN r.user u "
+          + "JOIN u.department d "
+          + "JOIN d.college c "
+          + "WHERE r.weekNumber = 2 "
+          + "AND r.storeName = :storeName "
+          + "AND (c.name IN :collegeNames OR d.name = :departmentName) "
+          + "GROUP BY u.id, c.id, c.name, d.id, d.name "
+          + "ORDER BY SUM(r.paymentAmount) DESC, MIN(u.createdAt) ASC")
+  List<Object[]> findWeek2RankingByCollegesOrDepartment(
+      @Param("storeName") String storeName,
+      @Param("collegeNames") List<String> collegeNames,
+      @Param("departmentName") String departmentName); // 2주차 단과대+학과 혼합 사용자 랭킹
 }
