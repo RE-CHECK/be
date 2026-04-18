@@ -14,15 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Order(3)
 public class WeekDataInitializer implements ApplicationRunner {
 
-  private static final Long WEEK_CONFIG_ID = 1L;
-
   private final WeekRepository weekRepository;
 
   @Override
   @Transactional
   public void run(ApplicationArguments args) {
-    if (weekRepository.existsById(WEEK_CONFIG_ID)) return;
+    if (weekRepository.existsById(Week.CONFIG_ID)) return;
 
-    weekRepository.save(Week.builder().id(WEEK_CONFIG_ID).weekNumber(null).build());
+    weekRepository.save(Week.builder().id(Week.CONFIG_ID).weekNumber(null).build());
   }
 }

@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WeekServiceImpl implements WeekService {
 
-  private static final Long WEEK_CONFIG_ID = 1L;
-
   private final WeekRepository weekRepository;
 
   @Override
@@ -46,7 +44,7 @@ public class WeekServiceImpl implements WeekService {
 
   private Week getWeekConfig() {
     return weekRepository
-        .findById(WEEK_CONFIG_ID)
+        .findById(Week.CONFIG_ID)
         .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
   }
 }

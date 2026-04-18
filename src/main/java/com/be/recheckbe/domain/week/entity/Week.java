@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "week_config")
 public class Week {
 
+  public static final Long CONFIG_ID = 1L;
+
   @Id private Long id; // 항상 1 (단일 행 싱글턴)
 
   @Column private Integer weekNumber; // null = 테스트 기간, 1~3 = 활성화된 주차
