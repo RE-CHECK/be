@@ -50,9 +50,9 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
-    // 승인번호 중복 확인
+    // 승인번호 중복 확인 (파싱 실패 시 0 반환 → 중복 체크 건너뜀)
     int confirmNum = parseConfirmNum(ocrData.getConfirmNum());
-    if (receiptRepository.existsByConfirmNum(confirmNum)) {
+    if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
 
