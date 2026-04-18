@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
+  boolean existsByConfirmNum(int confirmNum); // 승인번호 중복 확인
+
   @Query("SELECT COALESCE(SUM(r.paymentAmount), 0) FROM Receipt r WHERE r.user.id = :userId")
   int sumPaymentAmountByUserId(@Param("userId") Long userId); // 사용자 별 누적 소비 금액
 
