@@ -3,7 +3,6 @@ package com.be.recheckbe.domain.receipt.controller;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
-import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.service.ReceiptService;
 import com.be.recheckbe.global.response.BaseResponse;
@@ -30,13 +29,6 @@ public class ReceiptController {
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestPart("image") MultipartFile image) {
     return BaseResponse.success(receiptService.uploadReceiptImage(userDetails.getId(), image));
-  }
-
-  @GetMapping("/total-user-payment")
-  @Operation(summary = "사용자 별 총 결제금액 조회", description = "로그인한 사용자의 영수증 결제금액 합산을 조회합니다.")
-  public BaseResponse<TotalPaymentResponse> getTotalPaymentAmount(
-      @AuthenticationPrincipal CustomUserDetails userDetails) {
-    return BaseResponse.success(receiptService.getTotalPaymentAmount(userDetails.getId()));
   }
 
   @GetMapping("/total-participation")

@@ -4,13 +4,14 @@ import com.be.recheckbe.domain.college.entity.College;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
-import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
 import com.be.recheckbe.domain.user.entity.User;
 import com.be.recheckbe.domain.user.repository.UserRepository;
+import com.be.recheckbe.domain.week.entity.Week;
+import com.be.recheckbe.domain.week.repository.WeekRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
@@ -32,6 +33,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   private final OcrService ocrService;
   private final ReceiptRepository receiptRepository;
   private final UserRepository userRepository;
+  private final WeekRepository weekRepository;
 
   @Override
   @Transactional
@@ -47,6 +49,16 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
+    // 승인번호 중복 확인 (파싱 실패 시 0 반환 → 중복 체크 건너뜀)
+    int confirmNum = parseConfirmNum(ocrData.getConfirmNum());
+    if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
+      throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
+    }
+
+    // 현재 활성화된 주차 조회
+    Integer currentWeekNumber =
+        weekRepository.findById(Week.CONFIG_ID).map(week -> week.getWeekNumber()).orElse(null);
+
     // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
     String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
@@ -56,7 +68,8 @@ public class ReceiptServiceImpl implements ReceiptService {
             .paymentAmount(ocrData.getPaymentAmount())
             .storeName(ocrData.getStoreName())
             .cardCompany(cardCompany)
-            .confirmNum(parseConfirmNum(ocrData.getConfirmNum()))
+            .confirmNum(confirmNum)
+            .weekNumber(currentWeekNumber)
             .user(user)
             .build();
 
@@ -72,13 +85,6 @@ public class ReceiptServiceImpl implements ReceiptService {
     } catch (NumberFormatException e) {
       return 0;
     }
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public TotalPaymentResponse getTotalPaymentAmount(Long userId) {
-    int total = receiptRepository.sumPaymentAmountByUserId(userId);
-    return new TotalPaymentResponse(total);
   }
 
   @Override

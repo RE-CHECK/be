@@ -22,7 +22,7 @@ public class SwaggerConfig {
     localServer.setDescription("🛠️ 로컬 서버");
 
     Server prodServer = new Server();
-    prodServer.setUrl("");
+    prodServer.setUrl("https://api.reajoucheck.site");
     prodServer.setDescription("🚀 운영 서버");
 
     return new OpenAPI()
