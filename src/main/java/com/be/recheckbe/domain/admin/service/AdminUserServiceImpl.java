@@ -57,7 +57,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       String createdAt =
           user.getCreatedAt() != null ? user.getCreatedAt().format(DATE_TIME_FORMATTER) : "";
       String id = escape(String.valueOf(user.getId()));
-      String username = user.getUsername();
+      String username = escape(user.getUsername());
       String college = escape(user.getDepartment().getCollege().getName());
       String department = escape(user.getDepartment().getName());
       String name = escape(user.getName());
@@ -65,7 +65,7 @@ public class AdminUserServiceImpl implements AdminUserService {
       String phoneNum = escape(String.valueOf(user.getPhoneNumber()));
 
       writer.printf(
-          "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\" %n",
+          "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%n",
           createdAt, id, username, college, department, name, studentNum, phoneNum);
     }
 
