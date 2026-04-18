@@ -10,6 +10,7 @@ import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
 import com.be.recheckbe.domain.user.entity.User;
 import com.be.recheckbe.domain.user.repository.UserRepository;
+import com.be.recheckbe.domain.week.repository.WeekRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
@@ -27,10 +28,13 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   private static final String SUPPORTED_CARD_COMPANY = "국민카드";
 
+  private static final Long WEEK_CONFIG_ID = 1L;
+
   private final S3Service s3Service;
   private final OcrService ocrService;
   private final ReceiptRepository receiptRepository;
   private final UserRepository userRepository;
+  private final WeekRepository weekRepository;
 
   @Override
   @Transactional
@@ -52,6 +56,10 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
 
+    // 현재 활성화된 주차 조회
+    Integer currentWeekNumber =
+        weekRepository.findById(WEEK_CONFIG_ID).map(week -> week.getWeekNumber()).orElse(null);
+
     // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
     String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
@@ -62,6 +70,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             .storeName(ocrData.getStoreName())
             .cardCompany(cardCompany)
             .confirmNum(confirmNum)
+            .weekNumber(currentWeekNumber)
             .user(user)
             .build();
 
