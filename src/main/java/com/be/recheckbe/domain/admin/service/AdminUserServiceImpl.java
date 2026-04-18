@@ -64,7 +64,9 @@ public class AdminUserServiceImpl implements AdminUserService {
       String studentNum = escape(String.valueOf(user.getStudentNumber()));
       String phoneNum = escape(String.valueOf(user.getPhoneNumber()));
 
-      writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\" %n", createdAt, id, username, college, department, name, studentNum, phoneNum);
+      writer.printf(
+          "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\" %n",
+          createdAt, id, username, college, department, name, studentNum, phoneNum);
     }
 
     writer.flush();
