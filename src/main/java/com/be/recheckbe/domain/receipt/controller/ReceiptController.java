@@ -4,11 +4,13 @@ import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
+import com.be.recheckbe.domain.receipt.dto.Week2RankingGroupResponse;
 import com.be.recheckbe.domain.receipt.service.ReceiptService;
 import com.be.recheckbe.global.response.BaseResponse;
 import com.be.recheckbe.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,5 +52,11 @@ public class ReceiptController {
   public BaseResponse<CollegeTotalPaymentResponse> getCollegeTotalPaymentAmount(
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return BaseResponse.success(receiptService.getCollegeTotalPaymentAmount(userDetails.getId()));
+  }
+
+  @GetMapping("/week2-ranking")
+  @Operation(summary = "2주차 랭킹 조회", description = "대진별(store_name 기준) 2주차 영수증 금액 합산 1~4등을 조회합니다.")
+  public BaseResponse<List<Week2RankingGroupResponse>> getWeek2Ranking() {
+    return BaseResponse.success(receiptService.getWeek2Ranking());
   }
 }
