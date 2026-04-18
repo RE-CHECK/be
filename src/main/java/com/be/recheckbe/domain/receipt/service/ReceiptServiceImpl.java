@@ -46,6 +46,12 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
+    // 승인번호 중복 확인
+    int confirmNum = parseConfirmNum(ocrData.getConfirmNum());
+    if (receiptRepository.existsByConfirmNum(confirmNum)) {
+      throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
+    }
+
     // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
     String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
@@ -55,7 +61,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             .paymentAmount(ocrData.getPaymentAmount())
             .storeName(ocrData.getStoreName())
             .cardCompany(cardCompany)
-            .confirmNum(parseConfirmNum(ocrData.getConfirmNum()))
+            .confirmNum(confirmNum)
             .user(user)
             .build();
 
