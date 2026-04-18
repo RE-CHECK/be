@@ -32,21 +32,23 @@
 ```
 src/main/java/com/be/recheckbe/
 ├── domain/                     # 비즈니스 도메인 (기능별 패키지)
+│   ├── admin/                  # 관리자 기능 (통계, CSV, 주차 관리)
 │   ├── auth/                   # 인증/인가 (로그인, 회원가입)
-│   ├── user/                   # 사용자 엔티티 및 레포지토리
 │   ├── college/                # 단과대학 데이터
 │   ├── department/             # 학과 데이터
-│   └── receipt/                # 영수증 업로드 및 통계
+│   ├── receipt/                # 영수증 업로드 및 통계/집계
+│   ├── user/                   # 사용자 엔티티 및 대시보드
+│   └── week/                   # 주차 활성화 상태 관리
 └── global/                     # 전역 공통 모듈
     ├── config/                 # 각종 설정 (CORS, S3, Swagger, Jackson)
     ├── security/               # Spring Security 설정, CustomUserDetails
     ├── jwt/                    # JWT 생성/검증/필터
     ├── exception/              # 글로벌 예외 처리 및 에러 코드
     ├── s3/                     # S3 파일 업로드 서비스
-    ├── common/                 # BaseEntity (createdAt, modifiedAt)
+    ├── common/                 # BaseTimeEntity (createdAt, modifiedAt)
     ├── response/               # 공통 응답 포맷 (BaseResponse<T>)
     ├── init/                   # 앱 시작 시 초기 데이터 생성
-    └── ocr/                    # OCR 관련 기능
+    └── ocr/                    # Naver OCR 영수증 정보 추출
 ```
 
 각 도메인 내부는 `controller / service / repository / entity / dto` 레이어로 구성.
@@ -64,14 +66,14 @@ Controller → Service (Interface + Impl) → Repository → Entity
 - Controller: `@RestController`, RESTful 엔드포인트
 - Service: 인터페이스 + `Impl` 구현 클래스 패턴 (`AuthService` / `AuthServiceImpl`)
 - Repository: Spring Data JPA `JpaRepository` 상속
-- Entity: JPA 어노테이션 적용, `BaseEntity` 상속으로 감사 필드 공통화
+- Entity: JPA 어노테이션 적용, `BaseTimeEntity` 상속으로 감사 필드 공통화
 
 **응답 포맷 통일** — 모든 API는 `BaseResponse<T>` 래퍼 사용:
 ```json
 {
   "success": true,
   "code": 200,
-  "message": "...",
+  "message": "요청이 성공적으로 처리되었습니다.",
   "data": { ... }
 }
 ```
@@ -93,26 +95,26 @@ Controller → Service (Interface + Impl) → Repository → Entity
 
 ### 예외 처리
 - `CustomException(ErrorCode)` 패턴으로 통일
-- 에러 코드는 도메인별 Enum으로 관리 (`GlobalErrorCode`, `AuthErrorCode`, `S3ErrorCode`)
+- 에러 코드는 도메인별 Enum으로 관리 (`GlobalErrorCode`, `AuthErrorCode`, `ReceiptErrorCode`, `S3ErrorCode`)
 - `GlobalExceptionHandler`에서 일괄 처리
 
 ### Git 커밋 메시지
 이모지 프리픽스 사용:
 ```
-✨ Feat    새 기능
-🐛 Fix     버그 수정
-♻️ Refactor 리팩토링
-📝 Docs    문서
-🎨 Style   코드 포맷
-✅ Test    테스트
-🔧 Chore   빌드/설정
+✨ Feat      새 기능
+🐛 Fix       버그 수정
+♻️ Refactor  리팩토링
+📝 Docs      문서
+🎨 Style     코드 포맷
+✅ Test      테스트
+🔧 Chore     빌드/설정
 ```
-- 별도의 수정 사항은 README.md 파일을 참고하여 커밋 메세지 컨벤션을 지킵니다.
+- 별도의 수정 사항은 README.md 파일을 참고하여 커밋 메시지 컨벤션을 지킵니다.
 
 ### Github Convention
-- pr과 issue 생성은 .github 파일 아래에 있는 각 템플릿 형식에 맞게 컨벤션을 지켜서 생성합니다.
-- 코드 수정이 완료되면 수정 완료된 코드들은 develop 브랜치로 pr을 생성합니다. 
-- pr 생성 시 외부에 노출되면 안되는 정보들은 pr에 적지 않고 검토사항에 확인을 요망한다고 표시합니다.
+- PR과 Issue 생성은 `.github` 폴더 하위 템플릿 형식에 맞게 작성합니다.
+- 코드 수정이 완료되면 `develop` 브랜치로 PR을 생성합니다.
+- PR 생성 시 외부에 노출되면 안 되는 정보는 적지 않고 검토사항에 확인을 요망한다고 표시합니다.
 
 ---
 
@@ -120,16 +122,22 @@ Controller → Service (Interface + Impl) → Repository → Entity
 
 ### User
 - `username` (unique), `password` (BCrypt), `name`, `phoneNumber`
-- `studentNumber`, `studentCardImageUrl` (S3 URL)
+- `studentNumber` (Integer, 예: 2023301001 → 23학번), `studentCardImageUrl` (S3 URL)
 - `role`: `USER` | `ADMIN`
 - `department` (ManyToOne), `receipts` (OneToMany)
 
 ### Receipt
-- `imageUrl` (S3 URL), `paymentAmount`, `weekNumber`
+- `imageUrl` (S3 URL), `paymentAmount`, `storeName`, `cardCompany`, `confirmNum` (unique)
+- `weekNumber` (Integer, null = 테스트 기간, 1~3 = 운영 주차)
 - `user` (ManyToOne)
 
 ### College / Department
 - `College` 1:N `Department` 관계
+
+### Week
+- 단일 행 싱글턴 (`id = 1` 고정)
+- `weekNumber` (null = 테스트 기간, 1~3 = 활성화된 주차)
+- 영수증 업로드 시 현재 활성 주차가 자동으로 기록됨
 
 ---
 
@@ -140,13 +148,15 @@ Controller → Service (Interface + Impl) → Repository → Entity
 - `GET /api/colleges/**`
 - `GET /api/receipts/total-participation`
 - `GET /api/receipts/total-all-payment`
+- `GET /api/receipts/week2-ranking`
+- `GET /api/receipts/week3-challenge`
 - Swagger UI (`/swagger-ui/**`, `/v3/api-docs/**`)
 
 ### 인증 필요
-- 위 목록 외 모든 엔드포인트
+- 위 목록 외 모든 엔드포인트 (`Authorization: Bearer {accessToken}`)
 
 ### 관리자 전용
-- `/api/admin/**`
+- `/api/admin/**` (`ADMIN` role 필요)
 
 ### JWT
 - Access Token 만료: 1시간
@@ -158,19 +168,44 @@ Controller → Service (Interface + Impl) → Repository → Entity
 
 ## API 엔드포인트 요약
 
+상세 명세(요청/응답 예시)는 [`docs/API.md`](docs/API.md) 참고.
+
+### Auth (인증) — 공개
 ```
-POST   /api/auth/login                       # 로그인
-POST   /api/auth/register                    # 회원가입 (multipart - 학생증 이미지 포함)
-GET    /api/auth/check-username              # 아이디 중복 확인
+GET    /api/auth/check-username                   # 아이디 중복 확인
+POST   /api/auth/login                            # 로그인
+POST   /api/auth/register                         # 회원가입 (multipart - 학생증 이미지 포함)
+```
 
-POST   /api/receipts/upload                  # 영수증 이미지 업로드 (인증 필요)
-GET    /api/receipts/total-user-payment      # 내 총 결제금액 (인증 필요)
-GET    /api/receipts/total-participation     # 전체 참여 인원 수 (공개)
-GET    /api/receipts/total-all-payment       # 전체 결제 합계 (공개)
-GET    /api/receipts/college-total-payment   # 단과대 총 결제금액 (인증 필요)
+### Colleges (단과대/학과) — 공개
+```
+GET    /api/colleges                              # 단과대 목록
+GET    /api/colleges/{collegeId}/departments      # 학과 목록
+```
 
-GET    /api/colleges                         # 단과대 목록 (공개)
-GET    /api/colleges/{id}/departments        # 학과 목록 (공개)
+### Receipts (영수증) — 혼합
+```
+POST   /api/receipts/upload                       # 영수증 이미지 업로드 (인증 필요, multipart)
+GET    /api/receipts/total-participation          # 전체 누적 참여 횟수 (공개)
+GET    /api/receipts/total-all-payment            # 전체 누적 소비금액 (공개)
+GET    /api/receipts/college-total-payment        # 내 단과대 누적 소비금액 (인증 필요)
+GET    /api/receipts/week2-ranking                # 2주차 대진별 단과대 랭킹 (공개)
+GET    /api/receipts/week3-challenge              # 3주차 학번 대결 현황 (공개)
+```
+
+### Users (사용자) — 인증 필요
+```
+GET    /api/users/me/dashboard                    # 내 대시보드 (이름, 단과대, 총 소비금액)
+```
+
+### Admin (관리자) — 관리자 전용
+```
+GET    /api/admin/users/stats                     # 가입자 수 통계 (오늘/누적)
+GET    /api/admin/users/csv                       # 유저 가입 정보 CSV 다운로드
+GET    /api/admin/receipts/csv                    # 일자별 단과대 소비금액 CSV 다운로드
+GET    /api/admin/weeks/current                   # 현재 활성화 주차 조회
+PATCH  /api/admin/weeks/{weekNumber}/activate     # 특정 주차 활성화 (1~3)
+PATCH  /api/admin/weeks/deactivate                # 주차 비활성화 (테스트 기간 전환)
 ```
 
 ---
@@ -211,14 +246,4 @@ Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 앱 시작 시 자동 생성:
 - 관리자 계정: `admin` / `1234`
 - 단과대 및 학과 기본 데이터
-
-## 클라이언트 요구사항
-
-### 관리자 페이지 기능
-- 가입일시 + 유저 id + 단과대 + 학과 정보를 csv파일로 다운 가능하도록 부탁드립니다.
-- 가입 일시는 YYYY-MM-DD HH:MM:SS 형식으로 부탁드립니다. (현재 createAt으로 응답해도 무방)
-- 데이터 형식은 전부 텍스트형식으로 통일 부탁드립니다.
-- 단과대 별 총 누적 가입자 수 + 학과 별 총 누적 가입자 수도 확인 가능했으면 좋겠습니다.
-
-### 단과대 별 소비금액
-- 단과대 별 소비금액을 일자별로 csv파일로 다운 가능하도록 부탁드립니다. (현재 createdAt으로 일자 응답)
+- 주차 설정 초기값 (`weekNumber = null`, 테스트 기간)
