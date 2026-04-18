@@ -62,4 +62,17 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
       @Param("storeName") String storeName,
       @Param("collegeNames") List<String> collegeNames,
       @Param("departmentName") String departmentName); // 2주차 단과대+학과 혼합 사용자 랭킹
+
+  @Query(
+      "SELECT COALESCE(SUM(r.paymentAmount), 0) "
+          + "FROM Receipt r "
+          + "JOIN r.user u "
+          + "WHERE r.weekNumber = 3 "
+          + "AND r.storeName = :storeName "
+          + "AND u.studentNumber >= :minStudentNum "
+          + "AND u.studentNumber <= :maxStudentNum")
+  int sumWeek3PaymentByStudentNumRange(
+      @Param("storeName") String storeName,
+      @Param("minStudentNum") int minStudentNum,
+      @Param("maxStudentNum") int maxStudentNum); // 3주차 학번 범위별 영수증 금액 합산
 }
