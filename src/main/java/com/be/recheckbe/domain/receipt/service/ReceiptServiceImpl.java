@@ -4,7 +4,6 @@ import com.be.recheckbe.domain.college.entity.College;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
-import com.be.recheckbe.domain.receipt.dto.TotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
@@ -72,13 +71,6 @@ public class ReceiptServiceImpl implements ReceiptService {
     } catch (NumberFormatException e) {
       return 0;
     }
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public TotalPaymentResponse getTotalPaymentAmount(Long userId) {
-    int total = receiptRepository.sumPaymentAmountByUserId(userId);
-    return new TotalPaymentResponse(total);
   }
 
   @Override
