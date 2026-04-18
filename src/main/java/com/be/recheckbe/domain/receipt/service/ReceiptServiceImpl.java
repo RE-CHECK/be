@@ -7,6 +7,7 @@ import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.Week2RankingGroupResponse;
+import com.be.recheckbe.domain.receipt.dto.Week3ChallengeResponse;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
@@ -33,6 +34,19 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   private static final String SUPPORTED_CARD_COMPANY = "국민카드";
   private static final int RANKING_TOP_N = 4;
+
+  // 3주차 대진
+  private static final String CHALLENGE_STORE_NAME_23_24 = "사랑집4";
+  private static final String CHALLENGE_STORE_NAME_25_26 = "사랑집5";
+  // 학번 범위 (앞 4자리가 입학년도, e.g. 23학번 = 2023_000_000 ~ 2023_999_999)
+  private static final int STUDENT_NUM_MIN_23 = 2023_000_000;
+  private static final int STUDENT_NUM_MAX_23 = 2023_999_999;
+  private static final int STUDENT_NUM_MIN_24 = 2024_000_000;
+  private static final int STUDENT_NUM_MAX_24 = 2024_999_999;
+  private static final int STUDENT_NUM_MIN_25 = 2025_000_000;
+  private static final int STUDENT_NUM_MAX_25 = 2025_999_999;
+  private static final int STUDENT_NUM_MIN_26 = 2026_000_000;
+  private static final int STUDENT_NUM_MAX_26 = 2026_999_999;
 
   // 대진 1: 사랑집1
   private static final String RANKING_STORE_NAME_1 = "사랑집1";
@@ -147,6 +161,28 @@ public class ReceiptServiceImpl implements ReceiptService {
   @Transactional(readOnly = true)
   public List<Week2RankingGroupResponse> getWeek2Ranking() {
     return List.of(buildGroup1Ranking(), buildGroup2Ranking(), buildGroup3Ranking());
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<Week3ChallengeResponse> getWeek3Challenge() {
+    int total23 =
+        receiptRepository.sumWeek3PaymentByStudentNumRange(
+            CHALLENGE_STORE_NAME_23_24, STUDENT_NUM_MIN_23, STUDENT_NUM_MAX_23);
+    int total24 =
+        receiptRepository.sumWeek3PaymentByStudentNumRange(
+            CHALLENGE_STORE_NAME_23_24, STUDENT_NUM_MIN_24, STUDENT_NUM_MAX_24);
+
+    int total25 =
+        receiptRepository.sumWeek3PaymentByStudentNumRange(
+            CHALLENGE_STORE_NAME_25_26, STUDENT_NUM_MIN_25, STUDENT_NUM_MAX_25);
+    int total26 =
+        receiptRepository.sumWeek3PaymentByStudentNumRange(
+            CHALLENGE_STORE_NAME_25_26, STUDENT_NUM_MIN_26, STUDENT_NUM_MAX_26);
+
+    return List.of(
+        Week3ChallengeResponse.of("23학번", total23, "24학번", total24),
+        Week3ChallengeResponse.of("25학번", total25, "26학번", total26));
   }
 
   private Week2RankingGroupResponse buildGroup1Ranking() {
