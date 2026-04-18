@@ -57,9 +57,8 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     // 현재 활성화된 주차 조회
-    Integer currentWeekNumber = weekRepository.findById(WEEK_CONFIG_ID)
-        .map(week -> week.getWeekNumber())
-        .orElse(null);
+    Integer currentWeekNumber =
+        weekRepository.findById(WEEK_CONFIG_ID).map(week -> week.getWeekNumber()).orElse(null);
 
     // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
     String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);

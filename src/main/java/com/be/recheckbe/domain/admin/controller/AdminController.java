@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,13 +50,17 @@ public class AdminController {
   }
 
   @GetMapping("/weeks/current")
-  @Operation(summary = "현재 활성화 주차 조회", description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (관리자 전용)")
+  @Operation(
+      summary = "현재 활성화 주차 조회",
+      description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (관리자 전용)")
   public BaseResponse<CurrentWeekResponse> getCurrentWeek() {
     return BaseResponse.success(weekService.getCurrentWeek());
   }
 
   @PatchMapping("/weeks/{weekNumber}/activate")
-  @Operation(summary = "주차 활성화", description = "특정 주차(1~3)를 활성화합니다. 기존 활성화 주차는 자동으로 교체됩니다. (관리자 전용)")
+  @Operation(
+      summary = "주차 활성화",
+      description = "특정 주차(1~3)를 활성화합니다. 기존 활성화 주차는 자동으로 교체됩니다. (관리자 전용)")
   public BaseResponse<CurrentWeekResponse> activateWeek(@PathVariable int weekNumber) {
     return BaseResponse.success(weekService.activateWeek(weekNumber));
   }
