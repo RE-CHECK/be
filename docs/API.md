@@ -196,17 +196,68 @@
 
 ## 영수증 (Receipts)
 
-### 영수증 이미지 업로드
+### 영수증 OCR 분석
 
-**POST** `/api/receipts/upload` `🔒 인증 필요`
+**POST** `/api/receipts/analyze` `🔒 인증 필요`
 
 > `Content-Type: multipart/form-data`
+
+영수증 이미지를 OCR로 분석하여 결제 정보를 반환합니다. S3 업로드 및 DB 저장은 하지 않습니다.
+사용자가 OCR 결과를 확인한 뒤 `/confirm`을 호출해야 최종 저장됩니다.
 
 **Request (multipart/form-data)**
 
 | 필드 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | `image` | File | O | 영수증 이미지 (.jpg, .jpeg, .png, .gif, .webp / 최대 5MB) |
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    "storeName": "사랑집4",
+    "paymentAmount": 15000,
+    "cardCompany": "국민카드",
+    "confirmNum": "12345678"
+  }
+}
+```
+
+**에러 케이스**
+| 상태 | 메시지 |
+|------|--------|
+| `400` | 지원하지 않는 카드사 입니다. (국민카드만 허용) |
+| `409` | 이미 등록된 영수증입니다. |
+
+---
+
+### 영수증 업로드 확정
+
+**POST** `/api/receipts/confirm` `🔒 인증 필요`
+
+> `Content-Type: multipart/form-data`
+
+OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3에 업로드하고 DB에 저장합니다.
+
+**Request (multipart/form-data)**
+
+| 필드 | 타입 | Content-Type | 필수 | 설명 |
+|------|------|--------------|------|------|
+| `image` | File | - | O | 영수증 이미지 (.jpg, .jpeg, .png, .gif, .webp / 최대 5MB) |
+| `data` | JSON | `application/json` | O | `/analyze` 응답의 OCR 결과 |
+
+`data` JSON 형식:
+```json
+{
+  "storeName": "사랑집4",
+  "paymentAmount": 15000,
+  "cardCompany": "국민카드",
+  "confirmNum": "12345678"
+}
+```
 
 **Response**
 ```json
