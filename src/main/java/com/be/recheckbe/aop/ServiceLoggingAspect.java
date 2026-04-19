@@ -65,11 +65,7 @@ public class ServiceLoggingAspect {
     } catch (Exception e) {
       long elapsed = System.currentTimeMillis() - start;
       log.error(
-          "[영수증 업로드 실패] userId={} | {}ms | [{}] {}",
-          userId,
-          elapsed,
-          errorCode(e),
-          e.getMessage());
+          "[영수증 업로드 실패] userId={} | {}ms | [{}] {}", userId, elapsed, errorCode(e), e.getMessage());
       throw e;
     }
   }

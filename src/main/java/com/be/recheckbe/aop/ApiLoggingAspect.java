@@ -33,7 +33,8 @@ public class ApiLoggingAspect {
     } catch (Exception e) {
       long elapsed = System.currentTimeMillis() - start;
       String code = (e instanceof CustomException ce) ? ce.getErrorCode().getCode() : "UNKNOWN";
-      log.error("[{}] {} | {}ms | {} | [{}] {}", method, uri, elapsed, caller, code, e.getMessage());
+      log.error(
+          "[{}] {} | {}ms | {} | [{}] {}", method, uri, elapsed, caller, code, e.getMessage());
       throw e;
     }
   }
