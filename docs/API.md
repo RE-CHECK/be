@@ -459,7 +459,7 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
 
 ## 관리자 (Admin)
 
-> 모든 관리자 API는 `🔒 관리자 계정 인증 필요`
+> `GET /api/admin/weeks/current`를 제외한 모든 관리자 API는 `🔒 관리자 계정 인증 필요`
 
 ### 가입자 수 통계 조회
 
@@ -500,7 +500,7 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
 
 ### 현재 활성화 주차 조회
 
-**GET** `/api/admin/weeks/current`
+**GET** `/api/admin/weeks/current` `🌐 공개`
 
 **Response**
 ```json

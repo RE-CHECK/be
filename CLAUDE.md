@@ -150,6 +150,7 @@ Controller → Service (Interface + Impl) → Repository → Entity
 - `GET /api/receipts/total-all-payment`
 - `GET /api/receipts/week2-ranking`
 - `GET /api/receipts/week3-challenge`
+- `GET /api/admin/weeks/current`
 - Swagger UI (`/swagger-ui/**`, `/v3/api-docs/**`)
 
 ### 인증 필요
