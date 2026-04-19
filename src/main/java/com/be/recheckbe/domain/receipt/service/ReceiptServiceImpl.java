@@ -1,7 +1,9 @@
 package com.be.recheckbe.domain.receipt.service;
 
 import com.be.recheckbe.domain.college.entity.College;
+import com.be.recheckbe.domain.receipt.dto.AnalyzeReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
+import com.be.recheckbe.domain.receipt.dto.ConfirmReceiptRequest;
 import com.be.recheckbe.domain.receipt.dto.RankingResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
@@ -78,11 +80,9 @@ public class ReceiptServiceImpl implements ReceiptService {
   private final WeekRepository weekRepository;
 
   @Override
-  @Transactional
-  public UploadReceiptResponse uploadReceiptImage(Long userId, MultipartFile image) {
-    User user = userRepository.getReferenceById(userId);
-
-    // ocr 호출
+  @Transactional(readOnly = true)
+  public AnalyzeReceiptResponse analyzeReceiptImage(Long userId, MultipartFile image) {
+    // OCR 호출
     OcrExtractedData ocrData = ocrService.extractReceiptData(image);
 
     // 국민카드 영수증만 허용
@@ -97,18 +97,39 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
 
+    return AnalyzeReceiptResponse.from(ocrData);
+  }
+
+  @Override
+  @Transactional
+  public UploadReceiptResponse confirmReceiptUpload(
+      Long userId, MultipartFile image, ConfirmReceiptRequest data) {
+    User user = userRepository.getReferenceById(userId);
+
+    // 카드사 검증
+    String cardCompany = data.getCardCompany();
+    if (cardCompany == null || !cardCompany.contains(SUPPORTED_CARD_COMPANY)) {
+      throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
+    }
+
+    // 승인번호 중복 확인 (race condition 방지)
+    int confirmNum = parseConfirmNum(data.getConfirmNum());
+    if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
+      throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
+    }
+
     // 현재 활성화된 주차 조회
     Integer currentWeekNumber =
         weekRepository.findById(Week.CONFIG_ID).map(week -> week.getWeekNumber()).orElse(null);
 
-    // ocr 성공 시 s3로 업로드 (파일 고아(orphan) 방지)
+    // S3 업로드
     String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
 
     Receipt receipt =
         Receipt.builder()
             .imageUrl(imageUrl)
-            .paymentAmount(ocrData.getPaymentAmount())
-            .storeName(ocrData.getStoreName())
+            .paymentAmount(data.getPaymentAmount())
+            .storeName(data.getStoreName())
             .cardCompany(cardCompany)
             .confirmNum(confirmNum)
             .weekNumber(currentWeekNumber)
@@ -117,7 +138,13 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     receiptRepository.save(receipt);
 
-    return UploadReceiptResponse.of(imageUrl, ocrData);
+    return UploadReceiptResponse.builder()
+        .imageUrl(imageUrl)
+        .storeName(data.getStoreName())
+        .paymentAmount(data.getPaymentAmount())
+        .cardCompany(cardCompany)
+        .confirmNum(data.getConfirmNum())
+        .build();
   }
 
   private int parseConfirmNum(String confirmNum) {
