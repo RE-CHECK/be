@@ -39,9 +39,7 @@ public class ReceiptController {
   }
 
   @PostMapping(value = "/confirm", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Operation(
-      summary = "영수증 업로드 확정",
-      description = "OCR 분석 결과를 확인한 후 영수증 이미지를 S3에 업로드하고 DB에 저장합니다.")
+  @Operation(summary = "영수증 업로드 확정", description = "OCR 분석 결과를 확인한 후 영수증 이미지를 S3에 업로드하고 DB에 저장합니다.")
   public BaseResponse<UploadReceiptResponse> confirmReceiptUpload(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestPart("image") MultipartFile image,
