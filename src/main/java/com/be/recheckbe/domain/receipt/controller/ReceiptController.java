@@ -1,6 +1,8 @@
 package com.be.recheckbe.domain.receipt.controller;
 
+import com.be.recheckbe.domain.receipt.dto.AnalyzeReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
+import com.be.recheckbe.domain.receipt.dto.ConfirmReceiptRequest;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
@@ -26,12 +28,26 @@ public class ReceiptController {
 
   private final ReceiptService receiptService;
 
-  @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Operation(summary = "영수증 이미지 업로드", description = "영수증 이미지를 S3에 업로드합니다.")
-  public BaseResponse<UploadReceiptResponse> uploadReceiptImage(
+  @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(
+      summary = "영수증 OCR 분석",
+      description = "영수증 이미지를 OCR로 분석하여 결제 정보를 반환합니다. S3 업로드 및 DB 저장은 하지 않습니다.")
+  public BaseResponse<AnalyzeReceiptResponse> analyzeReceiptImage(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestPart("image") MultipartFile image) {
-    return BaseResponse.success(receiptService.uploadReceiptImage(userDetails.getId(), image));
+    return BaseResponse.success(receiptService.analyzeReceiptImage(userDetails.getId(), image));
+  }
+
+  @PostMapping(value = "/confirm", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(
+      summary = "영수증 업로드 확정",
+      description = "OCR 분석 결과를 확인한 후 영수증 이미지를 S3에 업로드하고 DB에 저장합니다.")
+  public BaseResponse<UploadReceiptResponse> confirmReceiptUpload(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestPart("image") MultipartFile image,
+      @RequestPart("data") ConfirmReceiptRequest data) {
+    return BaseResponse.success(
+        receiptService.confirmReceiptUpload(userDetails.getId(), image, data));
   }
 
   @GetMapping("/total-participation")

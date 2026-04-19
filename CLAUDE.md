@@ -185,7 +185,8 @@ GET    /api/colleges/{collegeId}/departments      # 학과 목록
 
 ### Receipts (영수증) — 혼합
 ```
-POST   /api/receipts/upload                       # 영수증 이미지 업로드 (인증 필요, multipart)
+POST   /api/receipts/analyze                      # 영수증 OCR 분석 (인증 필요, multipart) — S3/DB 저장 없음
+POST   /api/receipts/confirm                      # 영수증 업로드 확정 (인증 필요, multipart) — S3 업로드 + DB 저장
 GET    /api/receipts/total-participation          # 전체 누적 참여 횟수 (공개)
 GET    /api/receipts/total-all-payment            # 전체 누적 소비금액 (공개)
 GET    /api/receipts/college-total-payment        # 내 단과대 누적 소비금액 (인증 필요)
