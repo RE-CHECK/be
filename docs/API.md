@@ -3,6 +3,18 @@
 > **Base URL**: `https://api.reajoucheck.site` 
 > **Content-Type**: `application/json` (파일 업로드 제외)
 > **인증**: `Authorization: Bearer {accessToken}` 헤더 사용
+> **Refresh Token**: HttpOnly 쿠키(`refreshToken`)로 관리 — JS 접근 불가, 로그인 시 자동 설정
+
+### Access Token 만료 처리
+
+Access Token이 만료된 상태로 요청을 보내면 서버가 자동으로 재발급합니다.
+
+1. 만료된 Access Token으로 요청
+2. 서버가 DB에 저장된 Refresh Token을 검증
+3. **Refresh Token 유효** → 새 Access Token을 응답 헤더 `Authorization`에 담아 반환, 요청 정상 처리
+4. **Refresh Token 만료** → `401` 반환 → 재로그인 필요
+
+클라이언트는 모든 응답에서 `Authorization` 헤더를 확인하여 새 토큰이 있으면 갱신해야 합니다.
 
 ---
 
@@ -61,16 +73,40 @@
   "code": 200,
   "message": "요청이 성공적으로 처리되었습니다.",
   "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
-    "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+    "accessToken": "eyJhbGciOiJIUzI1NiJ9..."
   }
 }
 ```
+
+> Refresh Token은 응답 body에 포함되지 않으며, `Set-Cookie: refreshToken=...; HttpOnly; Secure; SameSite=Strict` 헤더로 자동 설정됩니다.
 
 **에러 케이스**
 | 상태 | 메시지 |
 |------|--------|
 | `401` | 아이디 또는 비밀번호가 올바르지 않습니다. |
+
+---
+
+### 로그아웃
+
+**POST** `/api/auth/logout` `🔒 인증 필요`
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": null
+}
+```
+
+> DB에 저장된 Refresh Token을 삭제하고 쿠키를 만료시킵니다.
+
+**에러 케이스**
+| 상태 | 메시지 |
+|------|--------|
+| `401` | 로그인이 필요합니다. |
 
 ---
 

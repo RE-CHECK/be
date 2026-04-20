@@ -79,6 +79,14 @@ public class JwtProvider {
     return Long.parseLong(parseClaims(token).getSubject());
   }
 
+  public Long extractUserIdFromExpiredToken(String token) {
+    try {
+      return Long.parseLong(parseClaims(token).getSubject());
+    } catch (ExpiredJwtException e) {
+      return Long.parseLong(e.getClaims().getSubject());
+    }
+  }
+
   private Claims parseClaims(String token) {
     return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
   }

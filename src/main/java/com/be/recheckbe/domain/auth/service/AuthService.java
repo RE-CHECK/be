@@ -12,4 +12,6 @@ public interface AuthService {
   void register(RegisterRequest request, MultipartFile studentCardImage);
 
   LoginResponse login(LoginRequest request);
+
+  void logout(Long userId);
 }
