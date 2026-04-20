@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +9,6 @@ import lombok.Getter;
 public class LoginResponse {
 
   private final String accessToken;
-  private final String refreshToken;
+
+  @JsonIgnore private final String refreshToken;
 }
