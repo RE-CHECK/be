@@ -89,4 +89,14 @@ public class AuthServiceImpl implements AuthService {
 
     return new LoginResponse(accessToken, refreshToken);
   }
+
+  @Override
+  @Transactional
+  public void logout(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new CustomException(AuthErrorCode.AUTHENTICATION_NOT_FOUND));
+    user.updateRefreshToken(null);
+  }
 }
