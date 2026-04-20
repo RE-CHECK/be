@@ -13,7 +13,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "receipts")
+@Table(name = "receipts", indexes = {
+    @Index(name = "idx_receipt_user_id", columnList = "user_id"),
+    @Index(name = "idx_receipt_week_number", columnList = "week_number"),
+    @Index(name = "idx_receipt_store_name", columnList = "store_name"),
+    @Index(name = "idx_receipt_week_store", columnList = "week_number, store_name")
+})
 public class Receipt extends BaseTimeEntity {
 
   @Id
