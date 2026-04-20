@@ -55,6 +55,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .hasAuthority("ADMIN")
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
                     .permitAll()
+                    .requestMatchers("/actuator/prometheus", "/actuator/health")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .exceptionHandling(
