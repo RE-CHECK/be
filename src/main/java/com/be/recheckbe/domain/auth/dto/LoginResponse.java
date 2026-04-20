@@ -10,6 +10,5 @@ public class LoginResponse {
 
   private final String accessToken;
 
-  @JsonIgnore
-  private final String refreshToken;
+  @JsonIgnore private final String refreshToken;
 }

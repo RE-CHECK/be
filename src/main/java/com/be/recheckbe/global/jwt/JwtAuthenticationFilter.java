@@ -61,7 +61,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private void setAuthentication(String token) {
     Long userId = jwtProvider.extractUserId(token);
-    CustomUserDetails userDetails = (CustomUserDetails) customUserDetailService.loadUserById(userId);
+    CustomUserDetails userDetails =
+        (CustomUserDetails) customUserDetailService.loadUserById(userId);
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -70,6 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   /**
    * 만료된 Access Token 수신 시 DB에 저장된 Refresh Token을 검증하여 새 Access Token을 발급한다.
+   *
    * @return 재발급 성공 여부
    */
   private boolean handleExpiredToken(String expiredToken, HttpServletResponse response)
