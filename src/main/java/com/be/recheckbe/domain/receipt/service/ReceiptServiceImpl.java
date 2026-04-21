@@ -20,12 +20,17 @@ import com.be.recheckbe.domain.week.repository.WeekRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
+import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.ocr.service.OcrService;
 import com.be.recheckbe.global.s3.enums.PathName;
 import com.be.recheckbe.global.s3.service.S3Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class ReceiptServiceImpl implements ReceiptService {
+
+  @Qualifier("taskExecutor")
+  private final Executor taskExecutor;
 
   private static final String SUPPORTED_CARD_COMPANY = "국민카드";
   private static final int RANKING_TOP_N = 4;
@@ -101,7 +109,6 @@ public class ReceiptServiceImpl implements ReceiptService {
   }
 
   @Override
-  @Transactional
   public UploadReceiptResponse confirmReceiptUpload(
       Long userId, MultipartFile image, ConfirmReceiptRequest data) {
     User user = userRepository.getReferenceById(userId);
@@ -112,18 +119,30 @@ public class ReceiptServiceImpl implements ReceiptService {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
-    // 승인번호 중복 확인 (race condition 방지)
+    // 승인번호 중복 확인
     int confirmNum = parseConfirmNum(data.getConfirmNum());
     if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
 
-    // 현재 활성화된 주차 조회
-    Integer currentWeekNumber =
-        weekRepository.findById(Week.CONFIG_ID).map(week -> week.getWeekNumber()).orElse(null);
+    // S3 업로드와 주차 조회를 병렬 실행 (S3 업로드가 완료되길 기다리는 동안 DB 커넥션 비점유)
+    CompletableFuture<String> uploadFuture =
+        CompletableFuture.supplyAsync(() -> s3Service.uploadFile(PathName.RECEIPT, image), taskExecutor);
 
-    // S3 업로드
-    String imageUrl = s3Service.uploadFile(PathName.RECEIPT, image);
+    Integer currentWeekNumber =
+        weekRepository.findById(Week.CONFIG_ID).map(Week::getWeekNumber).orElse(null);
+
+    String imageUrl;
+    try {
+      imageUrl = uploadFuture.get();
+    } catch (ExecutionException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof CustomException) throw (CustomException) cause;
+      throw new CustomException(S3ErrorCode.FILE_SERVER_ERROR);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new CustomException(S3ErrorCode.FILE_SERVER_ERROR);
+    }
 
     Receipt receipt =
         Receipt.builder()
