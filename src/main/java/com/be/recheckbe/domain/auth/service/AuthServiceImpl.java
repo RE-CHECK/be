@@ -3,6 +3,7 @@ package com.be.recheckbe.domain.auth.service;
 import com.be.recheckbe.domain.auth.dto.LoginRequest;
 import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
+import com.be.recheckbe.domain.auth.dto.RegisterResponse;
 import com.be.recheckbe.domain.auth.exception.AuthErrorCode;
 import com.be.recheckbe.domain.department.entity.Department;
 import com.be.recheckbe.domain.department.repository.DepartmentRepository;
@@ -45,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public void register(RegisterRequest request, MultipartFile studentCardImage) {
+  public RegisterResponse register(RegisterRequest request, MultipartFile studentCardImage) {
     if (userRepository.existsByUsername(request.getUsername())) {
       throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
     }
@@ -89,7 +90,8 @@ public class AuthServiceImpl implements AuthService {
             .studentCardImageUrl(studentCardImageUrl)
             .build();
 
-    userRepository.save(user);
+    User savedUser = userRepository.save(user);
+    return new RegisterResponse(savedUser.getId());
   }
 
   @Override
