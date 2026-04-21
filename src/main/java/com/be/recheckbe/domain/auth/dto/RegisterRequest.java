@@ -19,7 +19,7 @@ public class RegisterRequest {
 
   @NotBlank private String phoneNumber;
 
-  @NotNull private Integer studentNumber;
+  @NotNull private Long studentNumber;
 
   @NotNull private Long departmentId;
 }

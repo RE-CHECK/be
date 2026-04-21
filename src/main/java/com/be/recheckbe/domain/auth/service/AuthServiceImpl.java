@@ -83,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
             .password(encodedPassword)
             .name(request.getName())
             .phoneNumber(request.getPhoneNumber())
-            .studentNumber(Long.valueOf(request.getStudentNumber()))
+            .studentNumber(request.getStudentNumber())
             .role(Role.USER)
             .department(department)
             .studentCardImageUrl(studentCardImageUrl)
