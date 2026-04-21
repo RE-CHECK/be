@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
 
     user.updateRefreshToken(refreshToken);
 
-    return new LoginResponse(accessToken, refreshToken);
+    return new LoginResponse(user.getId(), accessToken, refreshToken);
   }
 
   @Override
