@@ -21,7 +21,6 @@ public class PopupDataInitializer implements ApplicationRunner {
   public void run(ApplicationArguments args) {
     if (popupRepository.existsById(Popup.CONFIG_ID)) return;
 
-    popupRepository.save(
-        Popup.builder().id(Popup.CONFIG_ID).content(null).active(false).build());
+    popupRepository.save(Popup.builder().id(Popup.CONFIG_ID).content(null).active(false).build());
   }
 }
