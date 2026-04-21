@@ -20,15 +20,15 @@ import com.be.recheckbe.domain.week.repository.WeekRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.exception.GlobalErrorCode;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
-import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.ocr.service.OcrService;
 import com.be.recheckbe.global.s3.enums.PathName;
+import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.s3.service.S3Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -127,7 +127,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     // S3 업로드와 주차 조회를 병렬 실행 (S3 업로드가 완료되길 기다리는 동안 DB 커넥션 비점유)
     CompletableFuture<String> uploadFuture =
-        CompletableFuture.supplyAsync(() -> s3Service.uploadFile(PathName.RECEIPT, image), taskExecutor);
+        CompletableFuture.supplyAsync(
+            () -> s3Service.uploadFile(PathName.RECEIPT, image), taskExecutor);
 
     Integer currentWeekNumber =
         weekRepository.findById(Week.CONFIG_ID).map(Week::getWeekNumber).orElse(null);

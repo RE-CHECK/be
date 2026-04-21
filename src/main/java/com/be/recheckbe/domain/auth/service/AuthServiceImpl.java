@@ -17,8 +17,8 @@ import com.be.recheckbe.global.s3.enums.PathName;
 import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.s3.service.S3Service;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
   @Qualifier("taskExecutor")
   private final Executor taskExecutor;
+
   private final UserRepository userRepository;
   private final DepartmentRepository departmentRepository;
   private final BCryptPasswordEncoder passwordEncoder;
