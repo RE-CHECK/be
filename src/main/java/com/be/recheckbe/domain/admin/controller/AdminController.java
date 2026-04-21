@@ -3,17 +3,22 @@ package com.be.recheckbe.domain.admin.controller;
 import com.be.recheckbe.domain.admin.dto.UserRegistrationStatsResponse;
 import com.be.recheckbe.domain.admin.service.AdminReceiptService;
 import com.be.recheckbe.domain.admin.service.AdminUserService;
+import com.be.recheckbe.domain.popup.dto.PopupResponse;
+import com.be.recheckbe.domain.popup.dto.UpdatePopupRequest;
+import com.be.recheckbe.domain.popup.service.PopupService;
 import com.be.recheckbe.domain.week.dto.CurrentWeekResponse;
 import com.be.recheckbe.domain.week.service.WeekService;
 import com.be.recheckbe.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +31,7 @@ public class AdminController {
   private final AdminUserService adminUserService;
   private final AdminReceiptService adminReceiptService;
   private final WeekService weekService;
+  private final PopupService popupService;
 
   @GetMapping("/users/stats")
   @Operation(summary = "가입자 수 통계 조회", description = "오늘 가입자 수와 누적 가입자 수를 조회합니다. (관리자 전용)")
@@ -50,9 +56,7 @@ public class AdminController {
   }
 
   @GetMapping("/weeks/current")
-  @Operation(
-      summary = "현재 활성화 주차 조회",
-      description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (관리자 전용)")
+  @Operation(summary = "현재 활성화 주차 조회", description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (전체 공개)")
   public BaseResponse<CurrentWeekResponse> getCurrentWeek() {
     return BaseResponse.success(weekService.getCurrentWeek());
   }
@@ -69,5 +73,17 @@ public class AdminController {
   @Operation(summary = "주차 비활성화", description = "활성화된 주차를 비활성화하여 테스트 기간으로 전환합니다. (관리자 전용)")
   public BaseResponse<CurrentWeekResponse> deactivateWeek() {
     return BaseResponse.success(weekService.deactivateWeek());
+  }
+
+  @PatchMapping("/popup")
+  @Operation(summary = "팝업 등록/수정", description = "팝업 텍스트를 등록하거나 수정합니다. 등록 즉시 활성화됩니다. (관리자 전용)")
+  public BaseResponse<PopupResponse> updatePopup(@RequestBody @Valid UpdatePopupRequest request) {
+    return BaseResponse.success(popupService.updatePopup(request.getContent()));
+  }
+
+  @PatchMapping("/popup/deactivate")
+  @Operation(summary = "팝업 비활성화", description = "현재 활성화된 팝업을 비활성화합니다. (관리자 전용)")
+  public BaseResponse<PopupResponse> deactivatePopup() {
+    return BaseResponse.success(popupService.deactivatePopup());
   }
 }

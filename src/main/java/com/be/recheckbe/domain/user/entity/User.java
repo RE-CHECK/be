@@ -17,7 +17,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
+@Table(
+    name = "users",
+    indexes = {
+      @Index(name = "idx_user_department_id", columnList = "department_id"),
+      @Index(name = "idx_user_student_number", columnList = "student_number")
+    })
 public class User extends BaseTimeEntity {
 
   @Id

@@ -593,3 +593,82 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
   }
 }
 ```
+
+---
+
+### 팝업 등록/수정
+
+**PATCH** `/api/admin/popup` `🔒 관리자 계정 인증 필요`
+
+**Request Body**
+```json
+{
+  "content": "이번 주 이벤트 참여하세요!"
+}
+```
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    "active": true,
+    "content": "이번 주 이벤트 참여하세요!",
+    "updatedAt": "2026-04-20T10:00:00"
+  }
+}
+```
+
+> 등록 즉시 활성화됩니다. 기존 팝업이 있으면 덮어씁니다.
+
+**에러 케이스**
+| 상태 | 메시지 |
+|------|--------|
+| `400` | 팝업 내용을 입력해주세요. |
+
+---
+
+### 팝업 비활성화
+
+**PATCH** `/api/admin/popup/deactivate` `🔒 관리자 계정 인증 필요`
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    "active": false,
+    "content": "이번 주 이벤트 참여하세요!",
+    "updatedAt": "2026-04-20T10:05:00"
+  }
+}
+```
+
+---
+
+## 팝업 (Popup)
+
+### 팝업 조회
+
+**GET** `/api/popup` `🌐 공개`
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    "active": true,
+    "content": "이번 주 이벤트 참여하세요!",
+    "updatedAt": "2026-04-20T10:00:00"
+  }
+}
+```
+
+> - `active: false`이면 팝업을 표시하지 않습니다.
+> - 클라이언트는 `updatedAt`을 `localStorage`에 저장하여, 동일한 값이면 팝업을 재표시하지 않습니다. 관리자가 팝업을 새로 등록하면 `updatedAt`이 변경되어 다시 표시됩니다.
