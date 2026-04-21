@@ -58,7 +58,7 @@ public class AdminController {
   @GetMapping("/weeks/current")
   @Operation(
       summary = "현재 활성화 주차 조회",
-      description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (관리자 전용)")
+      description = "현재 활성화된 주차를 조회합니다. null이면 테스트 기간입니다. (전체 공개)")
   public BaseResponse<CurrentWeekResponse> getCurrentWeek() {
     return BaseResponse.success(weekService.getCurrentWeek());
   }

@@ -55,23 +55,23 @@ public class ReceiptServiceImpl implements ReceiptService {
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_1 =
       List.of("공과대학", "소프트웨어융합대학", "첨단바이오융합대학", "인문대학");
 
-  // 대진 2: 사랑집3
-  private static final String RANKING_STORE_NAME_2 = "사랑집3";
+  // 대진 2: 사랑집2
+  private static final String RANKING_STORE_NAME_2 = "사랑집2";
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_2 =
-      List.of("첨단바이오융합대학", "다산학부대학", "사회과학대학");
-  // 국방디지털융합과는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
-  private static final String RANKING_ELIGIBLE_DEPARTMENT_2 = "국방디지털융합과";
-  private static final String RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_2 = "국방디지털융합학과";
-
-  // 대진 3: 사랑집2
-  private static final String RANKING_STORE_NAME_3 = "사랑집2";
-  private static final List<String> RANKING_ELIGIBLE_COLLEGES_3 =
       List.of("자연과학대학", "경영대학", "의과대학", "간호대학", "약학대학");
   // 의과대학, 간호대학, 약학대학은 "메디컬"로 통합 표시
-  private static final List<String> RANKING_MEDICAL_COLLEGES_3 = List.of("의과대학", "간호대학", "약학대학");
-  private static final String RANKING_MEDICAL_DISPLAY_NAME_3 = "메디컬";
+  private static final List<String> RANKING_MEDICAL_COLLEGES_2 = List.of("의과대학", "간호대학", "약학대학");
+  private static final String RANKING_MEDICAL_DISPLAY_NAME_2 = "메디컬";
   // 경제정치사회융합학부는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
-  private static final String RANKING_ELIGIBLE_DEPARTMENT_3 = "경제정치사회융합학부";
+  private static final String RANKING_ELIGIBLE_DEPARTMENT_2 = "경제정치사회융합학부";
+
+  // 대진 3: 사랑집3
+  private static final String RANKING_STORE_NAME_3 = "사랑집3";
+  private static final List<String> RANKING_ELIGIBLE_COLLEGES_3 =
+      List.of("첨단바이오융합대학", "다산학부대학", "사회과학대학");
+  // 국방디지털융합과는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
+  private static final String RANKING_ELIGIBLE_DEPARTMENT_3 = "국방디지털융합과";
+  private static final String RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_3 = "국방디지털융합학과";
 
   private final S3Service s3Service;
   private final OcrService ocrService;
@@ -238,11 +238,16 @@ public class ReceiptServiceImpl implements ReceiptService {
       String collegeName = (String) rows.get(i)[0];
       String departmentName = (String) rows.get(i)[1];
       int totalPaymentAmount = ((Number) rows.get(i)[2]).intValue();
-      // 국방디지털융합과는 학과(department)이지만 예외적으로 학과명을 단과대 자리에 표시
-      String displayName =
-          RANKING_ELIGIBLE_DEPARTMENT_2.equals(departmentName)
-              ? RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_2
-              : collegeName;
+      // 의과대학/간호대학/약학대학은 "메디컬"로 통합 표시
+      // 경제정치사회융합학부는 학과(department)이지만 예외적으로 학과명을 단과대 자리에 표시
+      String displayName;
+      if (RANKING_MEDICAL_COLLEGES_2.contains(collegeName)) {
+        displayName = RANKING_MEDICAL_DISPLAY_NAME_2;
+      } else if (RANKING_ELIGIBLE_DEPARTMENT_2.equals(departmentName)) {
+        displayName = RANKING_ELIGIBLE_DEPARTMENT_2;
+      } else {
+        displayName = collegeName;
+      }
       rankings.add(new RankingResponse(i + 1, displayName, totalPaymentAmount));
     }
     return new Week2RankingGroupResponse(RANKING_STORE_NAME_2, rankings);
@@ -259,16 +264,11 @@ public class ReceiptServiceImpl implements ReceiptService {
       String collegeName = (String) rows.get(i)[0];
       String departmentName = (String) rows.get(i)[1];
       int totalPaymentAmount = ((Number) rows.get(i)[2]).intValue();
-      // 의과대학/간호대학/약학대학은 "메디컬"로 통합 표시
-      // 경제정치사회융합학부는 학과(department)이지만 예외적으로 학과명을 단과대 자리에 표시
-      String displayName;
-      if (RANKING_MEDICAL_COLLEGES_3.contains(collegeName)) {
-        displayName = RANKING_MEDICAL_DISPLAY_NAME_3;
-      } else if (RANKING_ELIGIBLE_DEPARTMENT_3.equals(departmentName)) {
-        displayName = RANKING_ELIGIBLE_DEPARTMENT_3;
-      } else {
-        displayName = collegeName;
-      }
+      // 국방디지털융합과는 학과(department)이지만 예외적으로 학과명을 단과대 자리에 표시
+      String displayName =
+          RANKING_ELIGIBLE_DEPARTMENT_3.equals(departmentName)
+              ? RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_3
+              : collegeName;
       rankings.add(new RankingResponse(i + 1, displayName, totalPaymentAmount));
     }
     return new Week2RankingGroupResponse(RANKING_STORE_NAME_3, rankings);
