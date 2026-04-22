@@ -45,7 +45,7 @@ public class User extends BaseTimeEntity {
 
   @Column private String phoneNumber; // 전화번호
 
-  @Column private Integer studentNumber; // 학번
+  @Column private Long studentNumber; // 학번
 
   @Column private String studentCardImageUrl; // 학생증 사진 이미지 url
 

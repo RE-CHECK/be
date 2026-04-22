@@ -21,7 +21,7 @@ public class ServiceLoggingAspect {
   public Object logRegister(ProceedingJoinPoint joinPoint) throws Throwable {
     RegisterRequest request = extractArg(joinPoint, RegisterRequest.class);
     String username = request != null ? request.getUsername() : "unknown";
-    Integer studentNumber = request != null ? request.getStudentNumber() : null;
+    Long studentNumber = request != null ? request.getStudentNumber() : null;
 
     long start = System.currentTimeMillis();
     try {

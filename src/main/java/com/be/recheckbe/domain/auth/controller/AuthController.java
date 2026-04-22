@@ -3,6 +3,7 @@ package com.be.recheckbe.domain.auth.controller;
 import com.be.recheckbe.domain.auth.dto.LoginRequest;
 import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
+import com.be.recheckbe.domain.auth.dto.RegisterResponse;
 import com.be.recheckbe.domain.auth.service.AuthService;
 import com.be.recheckbe.global.response.BaseResponse;
 import com.be.recheckbe.global.security.CustomUserDetails;
@@ -58,11 +59,10 @@ public class AuthController {
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "회원가입")
-  public BaseResponse<Void> register(
+  public BaseResponse<RegisterResponse> register(
       @RequestPart("request") @Valid RegisterRequest request,
       @RequestPart("studentCardImage") MultipartFile studentCardImage) {
-    authService.register(request, studentCardImage);
-    return BaseResponse.success(null);
+    return BaseResponse.success(authService.register(request, studentCardImage));
   }
 
   private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
