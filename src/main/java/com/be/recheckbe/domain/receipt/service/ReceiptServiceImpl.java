@@ -61,7 +61,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   // 대진 1: 사랑집1
   private static final String RANKING_STORE_NAME_1 = "사랑집1";
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_1 =
-      List.of("공과대학", "소프트웨어융합대학", "첨단바이오융합대학", "인문대학");
+      List.of("공과대학", "소프트웨어융합대학", "첨단ICT융합대학", "인문대학");
 
   // 대진 2: 사랑집2
   private static final String RANKING_STORE_NAME_2 = "사랑집2";
