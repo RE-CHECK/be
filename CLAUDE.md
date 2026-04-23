@@ -150,6 +150,7 @@ Controller → Service (Interface + Impl) → Repository → Entity
 - `GET /api/receipts/total-all-payment`
 - `GET /api/receipts/week2-ranking`
 - `GET /api/receipts/week3-challenge`
+- `GET /api/receipts/weekly-college-ranking`
 - `GET /api/admin/weeks/current`
 - Swagger UI (`/swagger-ui/**`, `/v3/api-docs/**`)
 
@@ -193,6 +194,7 @@ GET    /api/receipts/total-all-payment            # 전체 누적 소비금액 (
 GET    /api/receipts/college-total-payment        # 내 단과대 누적 소비금액 (인증 필요)
 GET    /api/receipts/week2-ranking                # 2주차 대진별 단과대 랭킹 (공개)
 GET    /api/receipts/week3-challenge              # 3주차 학번 대결 현황 (공개)
+GET    /api/receipts/weekly-college-ranking       # 주차별 단과대 소비금액 top4 + 요일별 금액 (공개, ?weekNumber=1~3)
 ```
 
 ### Users (사용자) — 인증 필요

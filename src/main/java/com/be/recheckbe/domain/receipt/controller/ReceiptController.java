@@ -8,6 +8,7 @@ import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.Week2RankingGroupResponse;
 import com.be.recheckbe.domain.receipt.dto.Week3ChallengeResponse;
+import com.be.recheckbe.domain.receipt.dto.WeeklyRankingResponse;
 import com.be.recheckbe.domain.receipt.service.ReceiptService;
 import com.be.recheckbe.global.response.BaseResponse;
 import com.be.recheckbe.global.security.CustomUserDetails;
@@ -82,5 +83,14 @@ public class ReceiptController {
           "3주차 학번 대진 결과를 조회합니다. (23학번 vs 24학번 / 25학번 vs 26학번) 금액이 높은 학번이 승리하며, 동점이면 무승부로 반환됩니다.")
   public BaseResponse<List<Week3ChallengeResponse>> getWeek3Challenge() {
     return BaseResponse.success(receiptService.getWeek3Challenge());
+  }
+
+  @GetMapping("/weekly-college-ranking")
+  @Operation(
+      summary = "주차별 단과대 소비금액 랭킹 조회",
+      description = "요청한 주차(weekNumber: 1~3)의 단과대별 영수증 소비금액 합산 상위 4개 단과대를 반환합니다.")
+  public BaseResponse<WeeklyRankingResponse> getWeeklyCollegeRanking(
+      @RequestParam int weekNumber) {
+    return BaseResponse.success(receiptService.getWeeklyCollegeRanking(weekNumber));
   }
 }

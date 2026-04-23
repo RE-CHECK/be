@@ -75,4 +75,28 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
       @Param("storeName") String storeName,
       @Param("minStudentNum") int minStudentNum,
       @Param("maxStudentNum") int maxStudentNum); // 3주차 학번 범위별 영수증 금액 합산
+
+  @Query(
+      "SELECT c.name, SUM(r.paymentAmount) "
+          + "FROM Receipt r "
+          + "JOIN r.user u "
+          + "JOIN u.department d "
+          + "JOIN d.college c "
+          + "WHERE r.weekNumber = :weekNumber "
+          + "GROUP BY c.id, c.name "
+          + "ORDER BY SUM(r.paymentAmount) DESC")
+  List<Object[]> findCollegeRankingByWeekNumber(@Param("weekNumber") int weekNumber);
+
+  @Query(
+      "SELECT c.name, FUNCTION('TO_CHAR', r.createdAt, 'D'), SUM(r.paymentAmount) "
+          + "FROM Receipt r "
+          + "JOIN r.user u "
+          + "JOIN u.department d "
+          + "JOIN d.college c "
+          + "WHERE r.weekNumber = :weekNumber "
+          + "AND c.name IN :collegeNames "
+          + "GROUP BY c.id, c.name, FUNCTION('TO_CHAR', r.createdAt, 'D') "
+          + "ORDER BY c.name, FUNCTION('TO_CHAR', r.createdAt, 'D')")
+  List<Object[]> findDailyAmountByCollegesAndWeekNumber(
+      @Param("weekNumber") int weekNumber, @Param("collegeNames") List<String> collegeNames);
 }
