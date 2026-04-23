@@ -89,8 +89,7 @@ public class ReceiptController {
   @Operation(
       summary = "주차별 단과대 소비금액 랭킹 조회",
       description = "요청한 주차(weekNumber: 1~3)의 단과대별 영수증 소비금액 합산 상위 4개 단과대를 반환합니다.")
-  public BaseResponse<WeeklyRankingResponse> getWeeklyCollegeRanking(
-      @RequestParam int weekNumber) {
+  public BaseResponse<WeeklyRankingResponse> getWeeklyCollegeRanking(@RequestParam int weekNumber) {
     return BaseResponse.success(receiptService.getWeeklyCollegeRanking(weekNumber));
   }
 }
