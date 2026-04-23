@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class WeeklyRankingResponse {
-  private int weekNumber;
+  private Integer weekNumber;
   private List<CollegeDailyRankingResponse> rankings;
 }

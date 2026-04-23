@@ -82,10 +82,10 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
           + "JOIN r.user u "
           + "JOIN u.department d "
           + "JOIN d.college c "
-          + "WHERE r.weekNumber = :weekNumber "
+          + "WHERE (:weekNumber IS NULL AND r.weekNumber IS NULL) OR r.weekNumber = :weekNumber "
           + "GROUP BY c.id, c.name "
           + "ORDER BY SUM(r.paymentAmount) DESC")
-  List<Object[]> findCollegeRankingByWeekNumber(@Param("weekNumber") int weekNumber);
+  List<Object[]> findCollegeRankingByWeekNumber(@Param("weekNumber") Integer weekNumber);
 
   @Query(
       "SELECT c.name, FUNCTION('TO_CHAR', r.createdAt, 'D'), SUM(r.paymentAmount) "
@@ -93,10 +93,10 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
           + "JOIN r.user u "
           + "JOIN u.department d "
           + "JOIN d.college c "
-          + "WHERE r.weekNumber = :weekNumber "
+          + "WHERE ((:weekNumber IS NULL AND r.weekNumber IS NULL) OR r.weekNumber = :weekNumber) "
           + "AND c.name IN :collegeNames "
           + "GROUP BY c.id, c.name, FUNCTION('TO_CHAR', r.createdAt, 'D') "
           + "ORDER BY c.name, FUNCTION('TO_CHAR', r.createdAt, 'D')")
   List<Object[]> findDailyAmountByCollegesAndWeekNumber(
-      @Param("weekNumber") int weekNumber, @Param("collegeNames") List<String> collegeNames);
+      @Param("weekNumber") Integer weekNumber, @Param("collegeNames") List<String> collegeNames);
 }

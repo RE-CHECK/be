@@ -29,5 +29,5 @@ public interface ReceiptService {
 
   List<Week3ChallengeResponse> getWeek3Challenge();
 
-  WeeklyRankingResponse getWeeklyCollegeRanking(int weekNumber);
+  WeeklyRankingResponse getWeeklyCollegeRanking(Integer weekNumber);
 }
