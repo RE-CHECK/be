@@ -40,9 +40,9 @@ public class ReceiptServiceImpl implements ReceiptService {
   private static final String SUPPORTED_CARD_COMPANY = "국민카드";
   private static final int RANKING_TOP_N = 4;
 
-  private static final List<String> WEEK_DAY_NUMBERS = List.of("2", "3", "4", "5", "6");
+  private static final List<String> WEEK_DAY_NUMBERS = List.of("2", "3", "4", "5", "6", "7", "1");
   private static final Map<String, String> DAY_NUM_TO_KR =
-      Map.of("2", "월", "3", "화", "4", "수", "5", "목", "6", "금");
+      Map.of("2", "월", "3", "화", "4", "수", "5", "목", "6", "금", "7", "토", "1", "일");
 
   // 3주차 대진
   private static final String CHALLENGE_STORE_NAME_23_24 = "사랑집4";
