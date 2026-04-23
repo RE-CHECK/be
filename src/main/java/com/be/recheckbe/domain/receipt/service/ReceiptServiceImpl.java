@@ -1,15 +1,7 @@
 package com.be.recheckbe.domain.receipt.service;
 
 import com.be.recheckbe.domain.college.entity.College;
-import com.be.recheckbe.domain.receipt.dto.AnalyzeReceiptResponse;
-import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
-import com.be.recheckbe.domain.receipt.dto.ConfirmReceiptRequest;
-import com.be.recheckbe.domain.receipt.dto.RankingResponse;
-import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
-import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
-import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
-import com.be.recheckbe.domain.receipt.dto.Week2RankingGroupResponse;
-import com.be.recheckbe.domain.receipt.dto.Week3ChallengeResponse;
+import com.be.recheckbe.domain.receipt.dto.*;
 import com.be.recheckbe.domain.receipt.entity.Receipt;
 import com.be.recheckbe.domain.receipt.exception.ReceiptErrorCode;
 import com.be.recheckbe.domain.receipt.repository.ReceiptRepository;
@@ -25,10 +17,13 @@ import com.be.recheckbe.global.s3.enums.PathName;
 import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.s3.service.S3Service;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -44,6 +39,10 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   private static final String SUPPORTED_CARD_COMPANY = "국민카드";
   private static final int RANKING_TOP_N = 4;
+
+  private static final List<String> WEEK_DAY_NUMBERS = List.of("2", "3", "4", "5", "6");
+  private static final Map<String, String> DAY_NUM_TO_KR =
+      Map.of("2", "월", "3", "화", "4", "수", "5", "목", "6", "금");
 
   // 3주차 대진
   private static final String CHALLENGE_STORE_NAME_23_24 = "사랑집4";
@@ -61,7 +60,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   // 대진 1: 사랑집1
   private static final String RANKING_STORE_NAME_1 = "사랑집1";
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_1 =
-      List.of("공과대학", "소프트웨어융합대학", "첨단바이오융합대학", "인문대학");
+      List.of("공과대학", "소프트웨어융합대학", "첨단ICT융합대학", "인문대학");
 
   // 대진 2: 사랑집2
   private static final String RANKING_STORE_NAME_2 = "사랑집2";
@@ -292,5 +291,53 @@ public class ReceiptServiceImpl implements ReceiptService {
       rankings.add(new RankingResponse(i + 1, displayName, totalPaymentAmount));
     }
     return new Week2RankingGroupResponse(RANKING_STORE_NAME_3, rankings);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public WeeklyRankingResponse getWeeklyCollegeRanking(int weekNumber) {
+    // 1. 총액 기준 상위 4개 단과대 이름 확정
+    List<Object[]> topRows = receiptRepository.findCollegeRankingByWeekNumber(weekNumber);
+    int limit = Math.min(topRows.size(), RANKING_TOP_N);
+    List<String> topCollegeNames = new ArrayList<>();
+    for (int i = 0; i < limit; i++) {
+      topCollegeNames.add((String) topRows.get(i)[0]);
+    }
+
+    if (topCollegeNames.isEmpty()) {
+      return new WeeklyRankingResponse(weekNumber, List.of());
+    }
+
+    // 2. 상위 4개 단과대의 요일별 금액 조회
+    List<Object[]> dailyRows =
+        receiptRepository.findDailyAmountByCollegesAndWeekNumber(weekNumber, topCollegeNames);
+
+    // Map<collegeName, Map<dayNum, amount>>
+    Map<String, Map<String, Integer>> dailyMap = new HashMap<>();
+    for (Object[] row : dailyRows) {
+      String collegeName = (String) row[0];
+      String dayNum = (String) row[1];
+      int amount = ((Number) row[2]).intValue();
+      dailyMap.computeIfAbsent(collegeName, k -> new HashMap<>()).put(dayNum, amount);
+    }
+
+    // 3. 순위 순서 유지하며 응답 구성 (데이터 없는 요일은 0으로 채움)
+    List<CollegeDailyRankingResponse> rankings = new ArrayList<>();
+    for (int i = 0; i < topCollegeNames.size(); i++) {
+      String collegeName = topCollegeNames.get(i);
+      Map<String, Integer> dayAmounts = dailyMap.getOrDefault(collegeName, Map.of());
+
+      List<DailyAmountResponse> dailyAmounts =
+          WEEK_DAY_NUMBERS.stream()
+              .map(
+                  dayNum ->
+                      new DailyAmountResponse(
+                          DAY_NUM_TO_KR.get(dayNum), dayAmounts.getOrDefault(dayNum, 0)))
+              .collect(Collectors.toList());
+
+      rankings.add(new CollegeDailyRankingResponse(i + 1, collegeName, dailyAmounts));
+    }
+
+    return new WeeklyRankingResponse(weekNumber, rankings);
   }
 }

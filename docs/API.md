@@ -416,6 +416,60 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
 
 ---
 
+### 주차별 단과대 소비금액 랭킹 조회
+
+**GET** `/api/receipts/weekly-college-ranking?weekNumber={weekNumber}`
+
+해당 주차의 단과대별 영수증 소비금액 합산 기준 상위 4개 단과대와, 각 단과대의 요일별(월~금) 소비금액을 반환합니다.
+
+**Query Parameter**
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| `weekNumber` | int | O | 조회할 주차 (1, 2, 3) |
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": {
+    "weekNumber": 1,
+    "rankings": [
+      {
+        "rank": 1,
+        "collegeName": "공과대학",
+        "dailyAmounts": [
+          { "day": "월", "amount": 30000 },
+          { "day": "화", "amount": 45000 },
+          { "day": "수", "amount": 0 },
+          { "day": "목", "amount": 35000 },
+          { "day": "금", "amount": 20000 }
+        ]
+      },
+      {
+        "rank": 2,
+        "collegeName": "경영대학",
+        "dailyAmounts": [
+          { "day": "월", "amount": 20000 },
+          { "day": "화", "amount": 15000 },
+          { "day": "수", "amount": 30000 },
+          { "day": "목", "amount": 0 },
+          { "day": "금", "amount": 25000 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+> - `rankings`는 해당 주차 소비금액 총합 기준 내림차순 정렬이며 최대 4개입니다.
+> - 데이터가 없는 요일의 `amount`는 `0`으로 반환됩니다.
+> - 해당 주차에 영수증 데이터가 없으면 `rankings`는 빈 배열(`[]`)로 반환됩니다.
+
+---
+
 ### 3주차 학번 대결 현황 조회
 
 **GET** `/api/receipts/week3-challenge`
