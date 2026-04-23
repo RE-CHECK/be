@@ -295,7 +295,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   @Override
   @Transactional(readOnly = true)
-  public WeeklyRankingResponse getWeeklyCollegeRanking(int weekNumber) {
+  public WeeklyRankingResponse getWeeklyCollegeRanking(Integer weekNumber) {
     // 1. 총액 기준 상위 4개 단과대 이름 확정
     List<Object[]> topRows = receiptRepository.findCollegeRankingByWeekNumber(weekNumber);
     int limit = Math.min(topRows.size(), RANKING_TOP_N);

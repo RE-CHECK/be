@@ -88,8 +88,9 @@ public class ReceiptController {
   @GetMapping("/weekly-college-ranking")
   @Operation(
       summary = "주차별 단과대 소비금액 랭킹 조회",
-      description = "요청한 주차(weekNumber: 1~3)의 단과대별 영수증 소비금액 합산 상위 4개 단과대를 반환합니다.")
-  public BaseResponse<WeeklyRankingResponse> getWeeklyCollegeRanking(@RequestParam int weekNumber) {
+      description = "요청한 주차(weekNumber: 1~3, 미입력 시 테스트 기간)의 단과대별 영수증 소비금액 합산 상위 4개 단과대를 반환합니다.")
+  public BaseResponse<WeeklyRankingResponse> getWeeklyCollegeRanking(
+      @RequestParam(required = false) Integer weekNumber) {
     return BaseResponse.success(receiptService.getWeeklyCollegeRanking(weekNumber));
   }
 }
