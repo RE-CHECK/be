@@ -39,7 +39,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .authenticated()
                     .requestMatchers("/api/auth/**")
                     .permitAll()
-.requestMatchers("/api/receipts/total-participation")
+                    .requestMatchers("/api/receipts/total-participation")
                     .permitAll()
                     .requestMatchers("/api/receipts/total-all-payment")
                     .permitAll()
