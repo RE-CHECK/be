@@ -37,7 +37,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   @Qualifier("taskExecutor")
   private final Executor taskExecutor;
 
-  private static final String SUPPORTED_CARD_COMPANY = "국민카드";
+  private static final String SUPPORTED_CARD_COMPANY = "국민";
   private static final int RANKING_TOP_N = 4;
 
   private static final List<String> WEEK_DAY_NUMBERS = List.of("2", "3", "4", "5", "6", "7", "1");
