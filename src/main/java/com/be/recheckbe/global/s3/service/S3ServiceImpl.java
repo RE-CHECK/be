@@ -21,7 +21,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RequiredArgsConstructor
 public class S3ServiceImpl implements S3Service {
 
-  private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  private static final long MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
   private static final List<String> ALLOWED_EXTENSIONS =
       List.of(".jpg", ".jpeg", ".png", ".gif", ".webp");
 
