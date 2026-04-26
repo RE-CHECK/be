@@ -37,7 +37,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   @Qualifier("taskExecutor")
   private final Executor taskExecutor;
 
-  private static final String SUPPORTED_CARD_COMPANY = "국민";
+  private static final List<String> SUPPORTED_CARD_KEYWORDS = List.of("국민", "KB");
   private static final int RANKING_TOP_N = 4;
 
   private static final List<String> WEEK_DAY_NUMBERS = List.of("2", "3", "4", "5", "6", "7", "1");
@@ -94,7 +94,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     // 국민카드 영수증만 허용
     String cardCompany = ocrData.getCardCompany();
-    if (cardCompany == null || !cardCompany.contains(SUPPORTED_CARD_COMPANY)) {
+    if (cardCompany == null || SUPPORTED_CARD_KEYWORDS.stream().noneMatch(cardCompany::contains)) {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
@@ -114,7 +114,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     // 카드사 검증
     String cardCompany = data.getCardCompany();
-    if (cardCompany == null || !cardCompany.contains(SUPPORTED_CARD_COMPANY)) {
+    if (cardCompany == null || SUPPORTED_CARD_KEYWORDS.stream().noneMatch(cardCompany::contains)) {
       throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
     }
 
