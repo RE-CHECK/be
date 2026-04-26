@@ -39,8 +39,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .authenticated()
                     .requestMatchers("/api/auth/**")
                     .permitAll()
-                    .requestMatchers("/api/colleges/**")
-                    .permitAll()
                     .requestMatchers("/api/receipts/total-participation")
                     .permitAll()
                     .requestMatchers("/api/receipts/total-all-payment")

@@ -7,6 +7,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+      PGTZ: Asia/Seoul
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
@@ -34,6 +36,7 @@ services:
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       NAVER_OCR_SECRET_KEY: ${NAVER_OCR_SECRET_KEY}
       NAVER_OCR_API_URL: ${NAVER_OCR_API_URL}
+      JPA_TIMEZONE: Asia/Seoul
     depends_on:
       db:
         condition: service_healthy
