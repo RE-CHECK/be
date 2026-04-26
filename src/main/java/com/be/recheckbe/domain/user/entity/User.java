@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -53,6 +55,7 @@ public class User extends BaseTimeEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "department_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Department department;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
