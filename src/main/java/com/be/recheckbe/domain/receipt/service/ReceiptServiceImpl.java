@@ -87,7 +87,6 @@ public class ReceiptServiceImpl implements ReceiptService {
   private final WeekRepository weekRepository;
 
   @Override
-  @Transactional(readOnly = true)
   public AnalyzeReceiptResponse analyzeReceiptImage(Long userId, MultipartFile image) {
     // OCR 호출
     OcrExtractedData ocrData = ocrService.extractReceiptData(image);
