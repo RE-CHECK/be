@@ -7,6 +7,8 @@ import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
 import com.be.recheckbe.global.ocr.dto.OcrRequest;
 import com.be.recheckbe.global.ocr.dto.OcrResponse;
 import com.be.recheckbe.global.ocr.exception.OcrErrorCode;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -28,6 +30,7 @@ public class OcrServiceImpl implements OcrService {
 
   private final RestTemplate restTemplate;
   private final OcrConfig ocrConfig;
+  private final CircuitBreaker ocrCircuitBreaker;
 
   @Override
   public OcrExtractedData extractReceiptData(MultipartFile file) {
@@ -56,11 +59,19 @@ public class OcrServiceImpl implements OcrService {
     OcrResponse response;
     try {
       response =
-          restTemplate.postForObject(
-              ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
-    } catch (RestClientException e) {
-      log.error("OCR API 요청 실패: {}", e.getMessage());
-      throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+          ocrCircuitBreaker.executeSupplier(
+              () -> {
+                try {
+                  return restTemplate.postForObject(
+                      ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
+                } catch (RestClientException e) {
+                  log.error("OCR API 요청 실패: {}", e.getMessage());
+                  throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+                }
+              });
+    } catch (CallNotPermittedException e) {
+      log.warn("[OCR Circuit] OPEN - 요청 차단");
+      throw new CustomException(OcrErrorCode.OCR_CIRCUIT_OPEN);
     }
 
     return parseReceiptData(response);
@@ -96,10 +107,22 @@ public class OcrServiceImpl implements OcrService {
 
     OcrResponse.ReceiptResult result = imageResult.getReceipt().getResult();
 
-    int paymentAmount = parsePaymentAmount(result);
     String storeName = extractText(result.getStoreInfo(), OcrResponse.StoreInfo::getName);
     String cardCompany = extractCardCompany(result);
     String confirmNum = extractConfirmNum(result);
+    String totalPriceText =
+        result.getTotalPrice() != null && result.getTotalPrice().getPrice() != null
+            ? result.getTotalPrice().getPrice().getText()
+            : null;
+
+    log.warn(
+        "[OCR 추출] storeName='{}', cardCompany='{}', confirmNum='{}', totalPrice='{}'",
+        storeName,
+        cardCompany,
+        confirmNum,
+        totalPriceText);
+
+    int paymentAmount = parsePaymentAmount(result);
 
     return OcrExtractedData.builder()
         .storeName(storeName)

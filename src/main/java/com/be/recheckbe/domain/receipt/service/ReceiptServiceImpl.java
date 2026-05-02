@@ -25,11 +25,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReceiptServiceImpl implements ReceiptService {
@@ -87,7 +89,6 @@ public class ReceiptServiceImpl implements ReceiptService {
   private final WeekRepository weekRepository;
 
   @Override
-  @Transactional(readOnly = true)
   public AnalyzeReceiptResponse analyzeReceiptImage(Long userId, MultipartFile image) {
     // OCR 호출
     OcrExtractedData ocrData = ocrService.extractReceiptData(image);
@@ -99,7 +100,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     // 승인번호 중복 확인 (파싱 실패 시 0 반환 → 중복 체크 건너뜀)
-    int confirmNum = parseConfirmNum(ocrData.getConfirmNum());
+    long confirmNum = parseConfirmNum(ocrData.getConfirmNum());
     if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
@@ -119,7 +120,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     // 승인번호 중복 확인
-    int confirmNum = parseConfirmNum(data.getConfirmNum());
+    long confirmNum = parseConfirmNum(data.getConfirmNum());
     if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
@@ -166,12 +167,18 @@ public class ReceiptServiceImpl implements ReceiptService {
         .build();
   }
 
-  private int parseConfirmNum(String confirmNum) {
-    if (confirmNum == null || confirmNum.isBlank()) return 0;
+  private long parseConfirmNum(String confirmNum) {
+    if (confirmNum == null || confirmNum.isBlank()) {
+      log.warn("[confirmNum] OCR 추출값 없음 (null 또는 blank) → 0 처리");
+      return 0L;
+    }
     try {
-      return Integer.parseInt(confirmNum.replaceAll("[^0-9]", ""));
+      long parsed = Long.parseLong(confirmNum.replaceAll("[^0-9]", ""));
+      log.info("[confirmNum] raw='{}' → parsed={}", confirmNum, parsed);
+      return parsed;
     } catch (NumberFormatException e) {
-      return 0;
+      log.warn("[confirmNum] 파싱 실패: raw='{}' → 0 처리", confirmNum);
+      return 0L;
     }
   }
 

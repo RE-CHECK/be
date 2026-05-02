@@ -2,6 +2,7 @@ package com.be.recheckbe.global.exception;
 
 import com.be.recheckbe.global.exception.model.BaseErrorCode;
 import com.be.recheckbe.global.response.BaseResponse;
+import java.sql.SQLTransientConnectionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,14 @@ public class GlobalExceptionHandler {
             .collect(Collectors.joining(" / "));
     log.warn("Validation 오류 발생: {}", errorMessages);
     return ResponseEntity.badRequest().body(BaseResponse.error(400, errorMessages));
+  }
+
+  @ExceptionHandler(SQLTransientConnectionException.class)
+  public ResponseEntity<BaseResponse<Object>> handleConnectionTimeout(
+      SQLTransientConnectionException ex) {
+    log.error("DB 커넥션 풀 타임아웃: {}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+        .body(BaseResponse.error(503, "서버가 혼잡합니다. 잠시 후 다시 시도해주세요."));
   }
 
   @ExceptionHandler(Exception.class)
