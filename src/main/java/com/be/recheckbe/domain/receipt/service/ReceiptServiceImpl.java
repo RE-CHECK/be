@@ -100,7 +100,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     // 승인번호 중복 확인 (파싱 실패 시 0 반환 → 중복 체크 건너뜀)
-    int confirmNum = parseConfirmNum(ocrData.getConfirmNum());
+    long confirmNum = parseConfirmNum(ocrData.getConfirmNum());
     if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
@@ -120,7 +120,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     // 승인번호 중복 확인
-    int confirmNum = parseConfirmNum(data.getConfirmNum());
+    long confirmNum = parseConfirmNum(data.getConfirmNum());
     if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
       throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
     }
@@ -167,18 +167,18 @@ public class ReceiptServiceImpl implements ReceiptService {
         .build();
   }
 
-  private int parseConfirmNum(String confirmNum) {
+  private long parseConfirmNum(String confirmNum) {
     if (confirmNum == null || confirmNum.isBlank()) {
       log.warn("[confirmNum] OCR 추출값 없음 (null 또는 blank) → 0 처리");
-      return 0;
+      return 0L;
     }
     try {
-      int parsed = Integer.parseInt(confirmNum.replaceAll("[^0-9]", ""));
+      long parsed = Long.parseLong(confirmNum.replaceAll("[^0-9]", ""));
       log.info("[confirmNum] raw='{}' → parsed={}", confirmNum, parsed);
       return parsed;
     } catch (NumberFormatException e) {
       log.warn("[confirmNum] 파싱 실패: raw='{}' → 0 처리", confirmNum);
-      return 0;
+      return 0L;
     }
   }
 
