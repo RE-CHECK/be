@@ -2,13 +2,13 @@ package com.be.recheckbe.global.ocr.service;
 
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.ocr.config.OcrConfig;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
 import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
 import com.be.recheckbe.global.ocr.dto.OcrRequest;
 import com.be.recheckbe.global.ocr.dto.OcrResponse;
 import com.be.recheckbe.global.ocr.exception.OcrErrorCode;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -110,11 +110,17 @@ public class OcrServiceImpl implements OcrService {
     String storeName = extractText(result.getStoreInfo(), OcrResponse.StoreInfo::getName);
     String cardCompany = extractCardCompany(result);
     String confirmNum = extractConfirmNum(result);
-    String totalPriceText = result.getTotalPrice() != null && result.getTotalPrice().getPrice() != null
-        ? result.getTotalPrice().getPrice().getText() : null;
+    String totalPriceText =
+        result.getTotalPrice() != null && result.getTotalPrice().getPrice() != null
+            ? result.getTotalPrice().getPrice().getText()
+            : null;
 
-    log.warn("[OCR 추출] storeName='{}', cardCompany='{}', confirmNum='{}', totalPrice='{}'",
-        storeName, cardCompany, confirmNum, totalPriceText);
+    log.warn(
+        "[OCR 추출] storeName='{}', cardCompany='{}', confirmNum='{}', totalPrice='{}'",
+        storeName,
+        cardCompany,
+        confirmNum,
+        totalPriceText);
 
     int paymentAmount = parsePaymentAmount(result);
 

@@ -35,7 +35,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(SQLTransientConnectionException.class)
-  public ResponseEntity<BaseResponse<Object>> handleConnectionTimeout(SQLTransientConnectionException ex) {
+  public ResponseEntity<BaseResponse<Object>> handleConnectionTimeout(
+      SQLTransientConnectionException ex) {
     log.error("DB 커넥션 풀 타임아웃: {}", ex.getMessage());
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
         .body(BaseResponse.error(503, "서버가 혼잡합니다. 잠시 후 다시 시도해주세요."));
