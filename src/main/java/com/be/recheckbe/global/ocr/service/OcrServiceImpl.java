@@ -107,10 +107,16 @@ public class OcrServiceImpl implements OcrService {
 
     OcrResponse.ReceiptResult result = imageResult.getReceipt().getResult();
 
-    int paymentAmount = parsePaymentAmount(result);
     String storeName = extractText(result.getStoreInfo(), OcrResponse.StoreInfo::getName);
     String cardCompany = extractCardCompany(result);
     String confirmNum = extractConfirmNum(result);
+    String totalPriceText = result.getTotalPrice() != null && result.getTotalPrice().getPrice() != null
+        ? result.getTotalPrice().getPrice().getText() : null;
+
+    log.warn("[OCR 추출] storeName='{}', cardCompany='{}', confirmNum='{}', totalPrice='{}'",
+        storeName, cardCompany, confirmNum, totalPriceText);
+
+    int paymentAmount = parsePaymentAmount(result);
 
     return OcrExtractedData.builder()
         .storeName(storeName)
