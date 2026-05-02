@@ -51,6 +51,9 @@ dependencies {
     // Monitoring
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Circuit Breaker
+    implementation 'io.github.resilience4j:resilience4j-spring-boot4:2.4.0'
 }
 
 tasks.named('test') {

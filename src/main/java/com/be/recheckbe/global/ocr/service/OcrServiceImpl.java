@@ -1,8 +1,9 @@
 package com.be.recheckbe.global.ocr.service;
 
 import com.be.recheckbe.global.exception.CustomException;
-import com.be.recheckbe.global.circuitbreaker.OcrCircuitBreaker;
 import com.be.recheckbe.global.ocr.config.OcrConfig;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
 import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
 import com.be.recheckbe.global.ocr.dto.OcrRequest;
@@ -29,7 +30,7 @@ public class OcrServiceImpl implements OcrService {
 
   private final RestTemplate restTemplate;
   private final OcrConfig ocrConfig;
-  private final OcrCircuitBreaker circuitBreaker;
+  private final CircuitBreaker ocrCircuitBreaker;
 
   @Override
   public OcrExtractedData extractReceiptData(MultipartFile file) {
@@ -55,18 +56,23 @@ public class OcrServiceImpl implements OcrService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("X-OCR-SECRET", ocrConfig.getSecretKey());
 
-    // execute()로 감싸서 호출
-    OcrResponse response =
-        circuitBreaker.execute(
-            () -> {
-              try {
-                return restTemplate.postForObject(
-                    ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
-              } catch (RestClientException e) {
-                log.error("OCR API 요청 실패: {}", e.getMessage());
-                throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
-              }
-            });
+    OcrResponse response;
+    try {
+      response =
+          ocrCircuitBreaker.executeSupplier(
+              () -> {
+                try {
+                  return restTemplate.postForObject(
+                      ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
+                } catch (RestClientException e) {
+                  log.error("OCR API 요청 실패: {}", e.getMessage());
+                  throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+                }
+              });
+    } catch (CallNotPermittedException e) {
+      log.warn("[OCR Circuit] OPEN - 요청 차단");
+      throw new CustomException(OcrErrorCode.OCR_CIRCUIT_OPEN);
+    }
 
     return parseReceiptData(response);
   }
