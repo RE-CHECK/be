@@ -1,6 +1,7 @@
 package com.be.recheckbe.global.ocr.service;
 
 import com.be.recheckbe.global.exception.CustomException;
+import com.be.recheckbe.global.circuitbreaker.OcrCircuitBreaker;
 import com.be.recheckbe.global.ocr.config.OcrConfig;
 import com.be.recheckbe.global.ocr.dto.OcrExtractedData;
 import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
@@ -28,6 +29,7 @@ public class OcrServiceImpl implements OcrService {
 
   private final RestTemplate restTemplate;
   private final OcrConfig ocrConfig;
+  private final OcrCircuitBreaker circuitBreaker;
 
   @Override
   public OcrExtractedData extractReceiptData(MultipartFile file) {
@@ -53,15 +55,18 @@ public class OcrServiceImpl implements OcrService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("X-OCR-SECRET", ocrConfig.getSecretKey());
 
-    OcrResponse response;
-    try {
-      response =
-          restTemplate.postForObject(
-              ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
-    } catch (RestClientException e) {
-      log.error("OCR API 요청 실패: {}", e.getMessage());
-      throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
-    }
+    // execute()로 감싸서 호출
+    OcrResponse response =
+        circuitBreaker.execute(
+            () -> {
+              try {
+                return restTemplate.postForObject(
+                    ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
+              } catch (RestClientException e) {
+                log.error("OCR API 요청 실패: {}", e.getMessage());
+                throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+              }
+            });
 
     return parseReceiptData(response);
   }
