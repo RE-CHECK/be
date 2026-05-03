@@ -113,18 +113,6 @@ public class ReceiptServiceImpl implements ReceiptService {
       Long userId, MultipartFile image, ConfirmReceiptRequest data) {
     User user = userRepository.getReferenceById(userId);
 
-    // 카드사 검증
-    String cardCompany = data.getCardCompany();
-    if (cardCompany == null || SUPPORTED_CARD_KEYWORDS.stream().noneMatch(cardCompany::contains)) {
-      throw new CustomException(ReceiptErrorCode.NOT_SUPPORT_CARD_COMPANY);
-    }
-
-    // 승인번호 중복 확인
-    long confirmNum = parseConfirmNum(data.getConfirmNum());
-    if (confirmNum != 0 && receiptRepository.existsByConfirmNum(confirmNum)) {
-      throw new CustomException(ReceiptErrorCode.DUPLICATE_RECEIPT);
-    }
-
     // S3 업로드와 주차 조회를 병렬 실행 (S3 업로드가 완료되길 기다리는 동안 DB 커넥션 비점유)
     CompletableFuture<String> uploadFuture =
         CompletableFuture.supplyAsync(
