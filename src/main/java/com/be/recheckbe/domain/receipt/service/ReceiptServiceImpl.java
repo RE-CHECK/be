@@ -138,8 +138,8 @@ public class ReceiptServiceImpl implements ReceiptService {
             .imageUrl(imageUrl)
             .paymentAmount(data.getPaymentAmount())
             .storeName(data.getStoreName())
-            .cardCompany(cardCompany)
-            .confirmNum(confirmNum)
+            .cardCompany(data.getCardCompany())
+            .confirmNum(Long.parseLong(data.getConfirmNum()))
             .weekNumber(currentWeekNumber)
             .user(user)
             .build();
@@ -150,7 +150,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         .imageUrl(imageUrl)
         .storeName(data.getStoreName())
         .paymentAmount(data.getPaymentAmount())
-        .cardCompany(cardCompany)
+        .cardCompany(data.getCardCompany())
         .confirmNum(data.getConfirmNum())
         .build();
   }
