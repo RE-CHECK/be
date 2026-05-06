@@ -139,7 +139,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             .paymentAmount(data.getPaymentAmount())
             .storeName(data.getStoreName())
             .cardCompany(data.getCardCompany())
-            .confirmNum(Long.parseLong(data.getConfirmNum()))
+            .confirmNum(parseConfirmNum(data.getConfirmNum()))
             .weekNumber(currentWeekNumber)
             .user(user)
             .build();

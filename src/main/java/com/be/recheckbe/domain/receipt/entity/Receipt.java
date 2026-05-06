@@ -38,7 +38,7 @@ public class Receipt extends BaseTimeEntity {
   @Column // (nullable = false)
   private String cardCompany; // 카드사
 
-  @Column(unique = true) // (nullable = false)
+  @Column // (nullable = false)
   private long confirmNum; // 영수증 승인번호
 
   @Column // (nullable = false)
