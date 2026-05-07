@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminReceiptServiceImpl implements AdminReceiptService {
 
+  private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
   private final ReceiptRepository receiptRepository;
 
   @Override
   @Transactional(readOnly = true)
   public void downloadCollegePaymentCsv(HttpServletResponse response) throws IOException {
-    String filename = "college_payment_" + LocalDate.now() + ".csv";
+    String filename = "college_payment_" + LocalDate.now(KST) + ".csv";
     response.setContentType("text/csv; charset=UTF-8");
     response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 

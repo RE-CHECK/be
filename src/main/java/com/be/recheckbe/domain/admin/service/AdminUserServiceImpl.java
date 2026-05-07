@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminUserServiceImpl implements AdminUserService {
 
+  private static final ZoneId KST = ZoneId.of("Asia/Seoul");
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -27,7 +29,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Override
   @Transactional(readOnly = true)
   public UserRegistrationStatsResponse getUserRegistrationStats() {
-    LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+    LocalDateTime startOfToday = LocalDate.now(KST).atStartOfDay();
     LocalDateTime endOfToday = startOfToday.plusDays(1);
 
     long todayCount =
@@ -40,7 +42,7 @@ public class AdminUserServiceImpl implements AdminUserService {
   @Override
   @Transactional(readOnly = true)
   public void downloadUsersCsv(HttpServletResponse response) throws IOException {
-    String filename = "users_" + LocalDate.now() + ".csv";
+    String filename = "users_" + LocalDate.now(KST) + ".csv";
     response.setContentType("text/csv; charset=UTF-8");
     response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 
@@ -51,7 +53,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     // 헤더
     writer.println(
-        "\"가입일시\",\"userId\",\"사용자명\",\"단과대\",\"학과\",\"이름\",\"학번\",\"전화번호\",\"학생증 이미지 URL\"");
+        "\"가입일시\",\"userId\",\"사용자아아디\",\"단과대\",\"학과\",\"이름\",\"학번\",\"전화번호\",\"학생증 이미지 URL\"");
 
     List<User> users = userRepository.findAllByRoleWithDepartmentAndCollege(Role.USER);
     for (User user : users) {
