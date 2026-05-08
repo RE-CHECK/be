@@ -48,10 +48,10 @@ public class BlacklistServiceImpl implements BlacklistService {
 
   @Override
   @Transactional
-  public void unbanBlacklist(Long blacklistId) {
+  public void unbanBlacklist(String phoneNumber) {
     Blacklist blacklist =
         blacklistRepository
-            .findById(blacklistId)
+            .findByPhoneNumberAndActiveTrue(phoneNumber)
             .orElseThrow(() -> new CustomException(AdminErrorCode.BLACKLIST_NOT_FOUND));
     blacklist.unban();
   }
