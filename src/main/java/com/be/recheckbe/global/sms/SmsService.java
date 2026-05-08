@@ -32,8 +32,7 @@ public class SmsService {
     Message message = new Message();
     message.setFrom(fromNumber);
     message.setTo(to);
-    message.setText(
-        "[RE:AJOU CHECK]\n" + "인증번호: " + code + "\n" + "타인에게 절대로 노출하지 마세요.");
+    message.setText("[RE:AJOU CHECK]\n" + "인증번호: " + code + "\n" + "타인에게 절대로 노출하지 마세요.");
     try {
       messageService.sendOne(new SingleMessageSendingRequest(message));
     } catch (Exception e) {
