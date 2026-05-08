@@ -14,6 +14,7 @@ public enum AuthErrorCode implements BaseErrorCode {
   AUTHENTICATION_NOT_FOUND("AUTH_4003", "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED),
   INVALID_AUTH_CONTEXT("AUTH_4004", "SecurityContext에 인증 정보가 없습니다.", HttpStatus.UNAUTHORIZED),
 
+  PHONE_NUMBER_ALREADY_EXISTS("AUTH_4009", "이미 가입된 전화번호입니다.", HttpStatus.CONFLICT),
   PHONE_VERIFICATION_NOT_FOUND(
       "AUTH_4010", "인증 요청을 찾을 수 없습니다. 인증번호를 다시 요청해 주세요.", HttpStatus.BAD_REQUEST),
   PHONE_VERIFICATION_CODE_EXPIRED("AUTH_4011", "인증번호가 만료되었습니다.", HttpStatus.BAD_REQUEST),

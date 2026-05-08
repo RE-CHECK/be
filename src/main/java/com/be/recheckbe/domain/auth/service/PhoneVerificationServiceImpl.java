@@ -5,6 +5,7 @@ import com.be.recheckbe.domain.auth.dto.VerifyCodeResponse;
 import com.be.recheckbe.domain.auth.entity.PhoneVerification;
 import com.be.recheckbe.domain.auth.exception.AuthErrorCode;
 import com.be.recheckbe.domain.auth.repository.PhoneVerificationRepository;
+import com.be.recheckbe.domain.user.repository.UserRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import com.be.recheckbe.global.sms.SmsService;
 import java.security.SecureRandom;
@@ -22,11 +23,16 @@ public class PhoneVerificationServiceImpl implements PhoneVerificationService {
   private static final int CODE_EXPIRE_MINUTES = 5;
 
   private final PhoneVerificationRepository phoneVerificationRepository;
+  private final UserRepository userRepository;
   private final SmsService smsService;
 
   @Override
   @Transactional
   public void sendCode(String phoneNumber) {
+    if (userRepository.existsByPhoneNumber(phoneNumber)) {
+      throw new CustomException(AuthErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
+    }
+
     phoneVerificationRepository.deleteByPhoneNumber(phoneNumber);
 
     String code = generateCode();
