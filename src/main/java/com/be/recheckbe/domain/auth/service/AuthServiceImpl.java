@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
   private final BCryptPasswordEncoder passwordEncoder;
   private final S3Service s3Service;
   private final JwtProvider jwtProvider;
+  private final PhoneVerificationService phoneVerificationService;
 
   @Override
   public void checkUsername(String username) {
@@ -48,6 +49,9 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public RegisterResponse register(RegisterRequest request, MultipartFile studentCardImage) {
+    phoneVerificationService.validateAndConsumeToken(
+        request.getPhoneNumber(), request.getVerifiedToken());
+
     if (userRepository.existsByUsername(request.getUsername())) {
       throw new CustomException(AuthErrorCode.USERNAME_ALREADY_EXISTS);
     }

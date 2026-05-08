@@ -4,7 +4,11 @@ import com.be.recheckbe.domain.auth.dto.LoginRequest;
 import com.be.recheckbe.domain.auth.dto.LoginResponse;
 import com.be.recheckbe.domain.auth.dto.RegisterRequest;
 import com.be.recheckbe.domain.auth.dto.RegisterResponse;
+import com.be.recheckbe.domain.auth.dto.SendCodeRequest;
+import com.be.recheckbe.domain.auth.dto.VerifyCodeRequest;
+import com.be.recheckbe.domain.auth.dto.VerifyCodeResponse;
 import com.be.recheckbe.domain.auth.service.AuthService;
+import com.be.recheckbe.domain.auth.service.PhoneVerificationService;
 import com.be.recheckbe.global.response.BaseResponse;
 import com.be.recheckbe.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +35,7 @@ public class AuthController {
   private static final String REFRESH_TOKEN_COOKIE = "refreshToken";
 
   private final AuthService authService;
+  private final PhoneVerificationService phoneVerificationService;
 
   @GetMapping("/check-username")
   @Operation(summary = "아이디 중복확인")
@@ -55,6 +60,20 @@ public class AuthController {
     authService.logout(userDetails.getId());
     clearRefreshTokenCookie(response);
     return BaseResponse.success(null);
+  }
+
+  @PostMapping("/phone/send-code")
+  @Operation(summary = "휴대폰 인증번호 발송")
+  public BaseResponse<Void> sendVerificationCode(@RequestBody @Valid SendCodeRequest request) {
+    phoneVerificationService.sendCode(request.getPhoneNumber());
+    return BaseResponse.success(null);
+  }
+
+  @PostMapping("/phone/verify-code")
+  @Operation(summary = "휴대폰 인증번호 확인")
+  public BaseResponse<VerifyCodeResponse> verifyCode(
+      @RequestBody @Valid VerifyCodeRequest request) {
+    return BaseResponse.success(phoneVerificationService.verifyCode(request));
   }
 
   @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
