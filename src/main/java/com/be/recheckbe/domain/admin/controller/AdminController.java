@@ -1,23 +1,28 @@
 package com.be.recheckbe.domain.admin.controller;
 
+import com.be.recheckbe.domain.admin.dto.BanUserRequest;
 import com.be.recheckbe.domain.admin.dto.UserRegistrationStatsResponse;
 import com.be.recheckbe.domain.admin.service.AdminReceiptService;
 import com.be.recheckbe.domain.admin.service.AdminUserService;
+import com.be.recheckbe.domain.admin.service.BlacklistService;
 import com.be.recheckbe.domain.popup.dto.PopupResponse;
 import com.be.recheckbe.domain.popup.dto.UpdatePopupRequest;
 import com.be.recheckbe.domain.popup.service.PopupService;
 import com.be.recheckbe.domain.week.dto.CurrentWeekResponse;
 import com.be.recheckbe.domain.week.service.WeekService;
 import com.be.recheckbe.global.response.BaseResponse;
+import com.be.recheckbe.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +37,7 @@ public class AdminController {
   private final AdminReceiptService adminReceiptService;
   private final WeekService weekService;
   private final PopupService popupService;
+  private final BlacklistService blacklistService;
 
   @GetMapping("/users/stats")
   @Operation(summary = "가입자 수 통계 조회", description = "오늘 가입자 수와 누적 가입자 수를 조회합니다. (관리자 전용)")
@@ -85,5 +91,31 @@ public class AdminController {
   @Operation(summary = "팝업 비활성화", description = "현재 활성화된 팝업을 비활성화합니다. (관리자 전용)")
   public BaseResponse<PopupResponse> deactivatePopup() {
     return BaseResponse.success(popupService.deactivatePopup());
+  }
+
+  @PostMapping("/blacklist")
+  @Operation(
+      summary = "블랙리스트 등록",
+      description = "전화번호를 블랙리스트에 등록합니다. 해당 번호로 가입된 계정이 있으면 함께 삭제됩니다. (관리자 전용)")
+  public BaseResponse<Void> banUser(
+      @RequestBody @Valid BanUserRequest request,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    blacklistService.banUser(request, userDetails.getId());
+    return BaseResponse.success(null);
+  }
+
+  @PatchMapping("/blacklist/{blacklistId}/unban")
+  @Operation(summary = "블랙리스트 해제", description = "블랙리스트를 해제하여 해당 전화번호로 재가입을 허용합니다. (관리자 전용)")
+  public BaseResponse<Void> unbanUser(@PathVariable Long blacklistId) {
+    blacklistService.unbanBlacklist(blacklistId);
+    return BaseResponse.success(null);
+  }
+
+  @GetMapping("/blacklist/csv")
+  @Operation(
+      summary = "블랙리스트 CSV 다운로드",
+      description = "차단 이력 전체를 CSV로 다운로드합니다. 차단 해제된 항목도 포함됩니다. (관리자 전용)")
+  public void downloadBlacklistCsv(HttpServletResponse response) throws IOException {
+    blacklistService.downloadBlacklistCsv(response);
   }
 }
