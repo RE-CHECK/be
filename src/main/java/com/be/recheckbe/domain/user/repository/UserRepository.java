@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByPhoneNumber(String phoneNumber);
 
+  Optional<User> findByPhoneNumber(String phoneNumber);
+
   long countByUsernameStartingWith(String prefix);
 
   @Query("SELECT u FROM User u JOIN FETCH u.department d JOIN FETCH d.college WHERE u.id = :userId")

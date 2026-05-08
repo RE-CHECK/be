@@ -58,7 +58,7 @@ public class User extends BaseTimeEntity {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Department department;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "user")
   @Builder.Default
   private List<Receipt> receipts = new ArrayList<>();
 

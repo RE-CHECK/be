@@ -1,5 +1,6 @@
 package com.be.recheckbe.domain.auth.service;
 
+import com.be.recheckbe.domain.admin.service.BlacklistService;
 import com.be.recheckbe.domain.auth.dto.VerifyCodeRequest;
 import com.be.recheckbe.domain.auth.dto.VerifyCodeResponse;
 import com.be.recheckbe.domain.auth.entity.PhoneVerification;
@@ -24,11 +25,15 @@ public class PhoneVerificationServiceImpl implements PhoneVerificationService {
 
   private final PhoneVerificationRepository phoneVerificationRepository;
   private final UserRepository userRepository;
+  private final BlacklistService blacklistService;
   private final SmsService smsService;
 
   @Override
   @Transactional
   public void sendCode(String phoneNumber) {
+    if (blacklistService.isBlacklisted(phoneNumber)) {
+      throw new CustomException(AuthErrorCode.PHONE_NUMBER_BLACKLISTED);
+    }
     if (userRepository.existsByPhoneNumber(phoneNumber)) {
       throw new CustomException(AuthErrorCode.PHONE_NUMBER_ALREADY_EXISTS);
     }
