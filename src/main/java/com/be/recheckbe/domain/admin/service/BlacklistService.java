@@ -8,7 +8,7 @@ public interface BlacklistService {
 
   void banUser(BanUserRequest request, Long adminId);
 
-  void unbanBlacklist(Long blacklistId);
+  void unbanBlacklist(String phoneNumber);
 
   boolean isBlacklisted(String phoneNumber);
 

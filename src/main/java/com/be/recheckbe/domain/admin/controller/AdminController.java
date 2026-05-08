@@ -104,10 +104,10 @@ public class AdminController {
     return BaseResponse.success(null);
   }
 
-  @PatchMapping("/blacklist/{blacklistId}/unban")
-  @Operation(summary = "블랙리스트 해제", description = "블랙리스트를 해제하여 해당 전화번호로 재가입을 허용합니다. (관리자 전용)")
-  public BaseResponse<Void> unbanUser(@PathVariable Long blacklistId) {
-    blacklistService.unbanBlacklist(blacklistId);
+  @PatchMapping("/blacklist/unban")
+  @Operation(summary = "블랙리스트 해제", description = "전화번호로 블랙리스트를 해제하여 해당 번호로 재가입을 허용합니다. (관리자 전용)")
+  public BaseResponse<Void> unbanUser(@RequestBody @Valid BanUserRequest request) {
+    blacklistService.unbanBlacklist(request.getPhoneNumber());
     return BaseResponse.success(null);
   }
 
