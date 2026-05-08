@@ -22,4 +22,6 @@ public class RegisterRequest {
   @NotNull private Long studentNumber;
 
   @NotNull private Long departmentId;
+
+  @NotBlank private String verifiedToken;
 }

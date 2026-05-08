@@ -54,6 +54,9 @@ dependencies {
 
     // Circuit Breaker
     implementation 'io.github.resilience4j:resilience4j-spring-boot4:2.4.0'
+
+    // Solapi SMS
+    implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
