@@ -12,6 +12,4 @@ public class BanUserRequest {
   @NotBlank
   @Pattern(regexp = "^01[016789]\\d{7,8}$", message = "올바른 휴대폰 번호를 입력해 주세요.")
   private String phoneNumber;
-
-  private String reason;
 }

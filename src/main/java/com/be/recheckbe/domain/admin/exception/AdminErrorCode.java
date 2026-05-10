@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum AdminErrorCode implements BaseErrorCode {
   ALREADY_BLACKLISTED("ADMIN_4090", "이미 블랙리스트에 등록된 전화번호입니다.", HttpStatus.CONFLICT),
-  BLACKLIST_NOT_FOUND("ADMIN_4040", "블랙리스트 항목을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+  BLACKLIST_NOT_FOUND("ADMIN_4040", "블랙리스트 항목을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+  USER_NOT_FOUND_BY_PHONE("ADMIN_4041", "해당 전화번호로 가입된 사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
   private final String code;
   private final String message;

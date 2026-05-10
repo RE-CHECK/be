@@ -21,8 +21,6 @@ public class Blacklist extends BaseTimeEntity {
   @Column(nullable = false, unique = true)
   private String phoneNumber;
 
-  @Column private String reason;
-
   @Column private Long bannedByAdminId;
 
   @Column(nullable = false)
