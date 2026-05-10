@@ -4,6 +4,7 @@ import com.be.recheckbe.domain.admin.dto.BanUserRequest;
 import com.be.recheckbe.domain.admin.entity.Blacklist;
 import com.be.recheckbe.domain.admin.exception.AdminErrorCode;
 import com.be.recheckbe.domain.admin.repository.BlacklistRepository;
+import com.be.recheckbe.domain.user.entity.User;
 import com.be.recheckbe.domain.user.repository.UserRepository;
 import com.be.recheckbe.global.exception.CustomException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,12 +36,15 @@ public class BlacklistServiceImpl implements BlacklistService {
       throw new CustomException(AdminErrorCode.ALREADY_BLACKLISTED);
     }
 
-    userRepository.findByPhoneNumber(request.getPhoneNumber()).ifPresent(userRepository::delete);
+    User user =
+        userRepository
+            .findByPhoneNumber(request.getPhoneNumber())
+            .orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND_BY_PHONE));
+    userRepository.delete(user);
 
     blacklistRepository.save(
         Blacklist.builder()
             .phoneNumber(request.getPhoneNumber())
-            .reason(request.getReason())
             .bannedByAdminId(adminId)
             .active(true)
             .build());
@@ -71,17 +75,16 @@ public class BlacklistServiceImpl implements BlacklistService {
 
     PrintWriter writer = response.getWriter();
     writer.write('﻿');
-    writer.println("\"차단일시\",\"전화번호\",\"차단 사유\",\"활성 여부\"");
+    writer.println("\"차단일시\",\"전화번호\",\"활성 여부\"");
 
     List<Blacklist> entries = blacklistRepository.findAllByOrderByCreatedAtDesc();
     for (Blacklist entry : entries) {
       String bannedAt =
           entry.getCreatedAt() != null ? entry.getCreatedAt().format(DATE_TIME_FORMATTER) : "";
       String phoneNumber = escape(entry.getPhoneNumber());
-      String reason = escape(entry.getReason());
       String active = entry.isActive() ? "차단중" : "해제됨";
 
-      writer.printf("\"%s\",\"%s\",\"%s\",\"%s\"%n", bannedAt, phoneNumber, reason, active);
+      writer.printf("\"%s\",\"%s\",\"%s\"%n", bannedAt, phoneNumber, active);
     }
 
     writer.flush();
