@@ -47,8 +47,8 @@ public class ReceiptServiceImpl implements ReceiptService {
       Map.of("2", "월", "3", "화", "4", "수", "5", "목", "6", "금", "7", "토", "1", "일");
 
   // 3주차 대진
-  private static final String CHALLENGE_STORE_NAME_23_24 = "사랑집4";
-  private static final String CHALLENGE_STORE_NAME_25_26 = "사랑집5";
+  private static final String CHALLENGE_STORE_NAME_23_24 = "소문난대구막창";
+  private static final String CHALLENGE_STORE_NAME_25_26 = "사랑집"; // fixed
   // 학번 범위 (앞 4자리가 입학년도, e.g. 23학번 = 2023_000_000 ~ 2023_999_999)
   private static final int STUDENT_NUM_MIN_23 = 2023_000_000;
   private static final int STUDENT_NUM_MAX_23 = 2023_999_999;
@@ -59,13 +59,13 @@ public class ReceiptServiceImpl implements ReceiptService {
   private static final int STUDENT_NUM_MIN_26 = 2026_000_000;
   private static final int STUDENT_NUM_MAX_26 = 2026_999_999;
 
-  // 대진 1: 사랑집1
-  private static final String RANKING_STORE_NAME_1 = "사랑집1";
+  // 대진 1: 아빠땡
+  private static final String RANKING_STORE_NAME_1 = "아빠땡";
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_1 =
       List.of("공과대학", "소프트웨어융합대학", "첨단ICT융합대학", "인문대학");
 
-  // 대진 2: 사랑집2
-  private static final String RANKING_STORE_NAME_2 = "사랑집2";
+  // 대진 2: 포푸리
+  private static final String RANKING_STORE_NAME_2 = "포푸리리프";
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_2 =
       List.of("자연과학대학", "경영대학", "의과대학", "간호대학", "약학대학");
   // 의과대학, 간호대학, 약학대학은 "메디컬"로 통합 표시
@@ -74,8 +74,8 @@ public class ReceiptServiceImpl implements ReceiptService {
   // 경제정치사회융합학부는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
   private static final String RANKING_ELIGIBLE_DEPARTMENT_2 = "경제정치사회융합학부";
 
-  // 대진 3: 사랑집3
-  private static final String RANKING_STORE_NAME_3 = "사랑집3";
+  // 대진 3: 조희탁
+  private static final String RANKING_STORE_NAME_3 = "조희탁커피"; // fixed
   private static final List<String> RANKING_ELIGIBLE_COLLEGES_3 =
       List.of("첨단바이오융합대학", "다산학부대학", "사회과학대학");
   // 국방디지털융합과는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
