@@ -19,7 +19,7 @@ public class OcrCircuitBreakerConfig {
         CircuitBreakerConfig.custom()
             .slidingWindowType(SlidingWindowType.COUNT_BASED)
             .slidingWindowSize(10) // 슬라이딩 윈도우 방식 : 최근 10개 요청 기준으로 판단
-            .minimumNumberOfCalls(5) // 최소 요청 수 (치소 5번 호출되기 전까지는 판단 안함
+            .minimumNumberOfCalls(5) // 최소 요청 수 (최소 5번 호출되기 전까지는 판단 안함)
             .failureRateThreshold(50) // 실패율이 50% 넘으면 OPEN
             .permittedNumberOfCallsInHalfOpenState(2) // HALF_OPEN에서 2개 요청만 허용함
             .waitDurationInOpenState(Duration.ofSeconds(60)) // OPEN 유지시간

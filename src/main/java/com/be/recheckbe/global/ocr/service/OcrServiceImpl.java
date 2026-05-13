@@ -69,7 +69,7 @@ public class OcrServiceImpl implements OcrService {
                   throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
                 }
               });
-    } catch (CallNotPermittedException e) {
+    } catch (CallNotPermittedException e) { // OPEN 상태 시 바로 error
       log.warn("[OCR Circuit] OPEN - 요청 차단");
       throw new CustomException(OcrErrorCode.OCR_CIRCUIT_OPEN);
     }
