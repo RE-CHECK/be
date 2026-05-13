@@ -24,8 +24,7 @@ public class OcrCircuitBreakerConfig {
             .permittedNumberOfCallsInHalfOpenState(2) // HALF_OPEN에서 2개 요청만 허용함
             .waitDurationInOpenState(Duration.ofSeconds(60)) // OPEN 유지시간
             .automaticTransitionFromOpenToHalfOpenEnabled(true) // 자동 HALF_OPEN
-            // 네트워크/연결 오류(OCR_REQUEST_FAILED)만 장애로 카운트
-            .recordException(
+            .recordException( // OCR_REQUEST_FAILED 에러 발생 시 장애 카운트(타임아웃 설정)
                 e ->
                     e instanceof CustomException ce
                         && ce.getErrorCode() == OcrErrorCode.OCR_REQUEST_FAILED)

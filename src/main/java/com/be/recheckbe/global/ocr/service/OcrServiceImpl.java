@@ -64,7 +64,7 @@ public class OcrServiceImpl implements OcrService {
                 try {
                   return restTemplate.postForObject(
                       ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
-                } catch (RestClientException e) {
+                } catch (RestClientException e) { // 읽기 타임아웃 초과 시 발생
                   log.error("OCR API 요청 실패: {}", e.getMessage());
                   throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
                 }
