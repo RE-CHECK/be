@@ -14,8 +14,7 @@ public enum OcrErrorCode implements BaseErrorCode {
   OCR_IMAGE_ENCODE_FAILED("OCR5002", "이미지 인코딩 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
   OCR_CIRCUIT_OPEN(
       "OCR5003", "OCR 서비스가 일시적으로 사용 불가합니다. 잠시 후 다시 시도해주세요.", HttpStatus.SERVICE_UNAVAILABLE),
-  OCR_BULKHEAD_FULL(
-      "OCR4003", "OCR 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.", HttpStatus.TOO_MANY_REQUESTS);
+  OCR_BULKHEAD_FULL("OCR4003", "OCR 요청이 너무 많습니다. 잠시 후 다시 시도해주세요.", HttpStatus.TOO_MANY_REQUESTS);
 
   private final String code;
   private final String message;
