@@ -216,7 +216,9 @@ Access Token이 만료된 상태로 요청을 보내면 서버가 자동으로 �
   "success": true,
   "code": 200,
   "message": "요청이 성공적으로 처리되었습니다.",
-  "data": null
+  "data": {
+    "id": 2
+  }
 }
 ```
 
@@ -463,26 +465,26 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
   "message": "요청이 성공적으로 처리되었습니다.",
   "data": [
     {
-      "storeName": "사랑집1",
+      "storeName": "아빠땡",
       "rankings": [
         { "rank": 1, "collegeName": "소프트웨어융합대학", "totalPaymentAmount": 320000 },
         { "rank": 2, "collegeName": "공과대학", "totalPaymentAmount": 210000 },
-        { "rank": 3, "collegeName": "첨단바이오융합대학", "totalPaymentAmount": 180000 },
+        { "rank": 3, "collegeName": "첨단ICT융합대학", "totalPaymentAmount": 180000 },
         { "rank": 4, "collegeName": "인문대학", "totalPaymentAmount": 90000 }
       ]
     },
     {
-      "storeName": "사랑집3",
-      "rankings": [
-        { "rank": 1, "collegeName": "사회과학대학", "totalPaymentAmount": 270000 },
-        { "rank": 2, "collegeName": "국방디지털융합학과", "totalPaymentAmount": 150000 }
-      ]
-    },
-    {
-      "storeName": "사랑집2",
+      "storeName": "포푸리리프",
       "rankings": [
         { "rank": 1, "collegeName": "경영대학", "totalPaymentAmount": 400000 },
         { "rank": 2, "collegeName": "메디컬", "totalPaymentAmount": 310000 }
+      ]
+    },
+    {
+      "storeName": "조희탁커피",
+      "rankings": [
+        { "rank": 1, "collegeName": "사회과학대학", "totalPaymentAmount": 270000 },
+        { "rank": 2, "collegeName": "국방디지털융합학과", "totalPaymentAmount": 150000 }
       ]
     }
   ]

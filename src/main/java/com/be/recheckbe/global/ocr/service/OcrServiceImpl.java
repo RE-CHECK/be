@@ -7,6 +7,8 @@ import com.be.recheckbe.global.ocr.dto.OcrImageRequest;
 import com.be.recheckbe.global.ocr.dto.OcrRequest;
 import com.be.recheckbe.global.ocr.dto.OcrResponse;
 import com.be.recheckbe.global.ocr.exception.OcrErrorCode;
+import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import java.io.IOException;
@@ -31,6 +33,7 @@ public class OcrServiceImpl implements OcrService {
   private final RestTemplate restTemplate;
   private final OcrConfig ocrConfig;
   private final CircuitBreaker ocrCircuitBreaker;
+  private final Bulkhead ocrBulkhead;
 
   @Override
   public OcrExtractedData extractReceiptData(MultipartFile file) {
@@ -59,17 +62,24 @@ public class OcrServiceImpl implements OcrService {
     OcrResponse response;
     try {
       response =
-          ocrCircuitBreaker.executeSupplier(
-              () -> {
-                try {
-                  return restTemplate.postForObject(
-                      ocrConfig.getApiUrl(), new HttpEntity<>(request, headers), OcrResponse.class);
-                } catch (RestClientException e) {
-                  log.error("OCR API 요청 실패: {}", e.getMessage());
-                  throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
-                }
-              });
-    } catch (CallNotPermittedException e) {
+          ocrBulkhead.executeSupplier(
+              () ->
+                  ocrCircuitBreaker.executeSupplier(
+                      () -> {
+                        try {
+                          return restTemplate.postForObject(
+                              ocrConfig.getApiUrl(),
+                              new HttpEntity<>(request, headers),
+                              OcrResponse.class);
+                        } catch (RestClientException e) { // 읽기 타임아웃 (5초) 초과시 발생
+                          log.error("OCR API 요청 실패: {}", e.getMessage());
+                          throw new CustomException(OcrErrorCode.OCR_REQUEST_FAILED);
+                        }
+                      }));
+    } catch (BulkheadFullException e) { // 동시 요청 3개 이상 요청 시 벌크헤드로 인해 오류
+      log.warn("[OCR Bulkhead] FULL - 요청 거절");
+      throw new CustomException(OcrErrorCode.OCR_BULKHEAD_FULL);
+    } catch (CallNotPermittedException e) { // 서킷 브레이커 OPEN 상태
       log.warn("[OCR Circuit] OPEN - 요청 차단");
       throw new CustomException(OcrErrorCode.OCR_CIRCUIT_OPEN);
     }

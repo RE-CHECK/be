@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Getter
@@ -18,6 +19,9 @@ public class OcrConfig {
 
   @Bean
   public RestTemplate restTemplate() {
-    return new RestTemplate();
+    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    factory.setConnectTimeout(3_000); // Naver server tcp 연결 타임아웃 3초
+    factory.setReadTimeout(5_000); // 읽기 타임아웃 5초 (평균 응답시간: 2.41초)
+    return new RestTemplate(factory);
   }
 }
