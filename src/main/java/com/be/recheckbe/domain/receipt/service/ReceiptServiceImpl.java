@@ -254,9 +254,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     // 금액 DESC, 동점이면 학번 인덱스 ASC(낮은 학번이 상위)
     totalsWithIndex.sort(
-        Comparator.<int[]>comparingInt(arr -> arr[1])
-            .reversed()
-            .thenComparingInt(arr -> arr[0]));
+        Comparator.<int[]>comparingInt(arr -> arr[1]).reversed().thenComparingInt(arr -> arr[0]));
 
     List<SpecialMatchRankingResponse> rankings = new ArrayList<>();
     for (int rank = 0; rank < totalsWithIndex.size(); rank++) {
