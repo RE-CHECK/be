@@ -84,7 +84,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   private static final String RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_3 = "국방디지털융합학과";
 
   // 스페셜 매치 (23/24/25/26 학번 4자 랭킹)
-  private static final String SPECIAL_MATCH_STORE = "경영인텔리빨사이에낀SPAGHETTL";
+  private static final String SPECIAL_MATCH_STORE = "경영인텔리빨사이에낀SPAGHETTI";
   private static final List<int[]> SPECIAL_MATCH_STUDENT_RANGES =
       List.of(
           new int[] {STUDENT_NUM_MIN_23, STUDENT_NUM_MAX_23},

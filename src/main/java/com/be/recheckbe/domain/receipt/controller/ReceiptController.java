@@ -90,7 +90,7 @@ public class ReceiptController {
   @Operation(
       summary = "스페셜 매치 학번 랭킹 조회",
       description =
-          "3주차 영수증 중 지정 가게(경영인텔리빨사이에낀SPAGHETTL)에 대해 23~26학번의 결제금액 합산을 기준으로 1~4등 랭킹을 반환합니다. 동점 시 낮은 학번이 상위로 정렬됩니다.")
+          "3주차 영수증 중 지정 가게(경영인텔리빨사이에낀SPAGHETTI)에 대해 23~26학번의 결제금액 합산을 기준으로 1~4등 랭킹을 반환합니다. 동점 시 낮은 학번이 상위로 정렬됩니다.")
   public BaseResponse<List<SpecialMatchRankingResponse>> getSpecialMatchRanking() {
     return BaseResponse.success(receiptService.getSpecialMatchRanking());
   }
