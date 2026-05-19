@@ -47,6 +47,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .permitAll()
                     .requestMatchers("/api/receipts/week3-challenge")
                     .permitAll()
+                    .requestMatchers("/api/receipts/special-match")
+                    .permitAll()
                     .requestMatchers("/api/receipts/weekly-college-ranking")
                     .permitAll()
                     .requestMatchers("/api/admin/weeks/current")

@@ -609,6 +609,32 @@ OCR 분석 결과를 사용자가 확인한 후 호출합니다. 이미지를 S3
 
 ---
 
+### 스페셜 매치 학번 랭킹 조회
+
+**GET** `/api/receipts/special-match`
+
+3주차 영수증 중 지정 가게(`경영인텔리빨사이에낀SPAGHETTL`)에 대해 23~26학번의 결제금액 합산 기준 1~4등 랭킹을 반환합니다.
+
+**Response**
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "요청이 성공적으로 처리되었습니다.",
+  "data": [
+    { "rank": 1, "studentYear": "24학번", "totalPaymentAmount": 50000 },
+    { "rank": 2, "studentYear": "23학번", "totalPaymentAmount": 30000 },
+    { "rank": 3, "studentYear": "25학번", "totalPaymentAmount": 20000 },
+    { "rank": 4, "studentYear": "26학번", "totalPaymentAmount": 0 }
+  ]
+}
+```
+
+> - 4개 학번(23/24/25/26)이 항상 모두 반환되며, 결제금액이 0원인 학번도 포함됩니다.
+> - 정렬 기준: 결제금액 내림차순, 동점 시 낮은 학번이 상위(23 → 24 → 25 → 26).
+
+---
+
 ## 사용자 (Users)
 
 ### 내 대시보드 조회

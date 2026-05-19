@@ -17,6 +17,7 @@ import com.be.recheckbe.global.s3.enums.PathName;
 import com.be.recheckbe.global.s3.exception.S3ErrorCode;
 import com.be.recheckbe.global.s3.service.S3Service;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,17 @@ public class ReceiptServiceImpl implements ReceiptService {
   // 국방디지털융합과는 학과(department)이지만 예외적으로 랭킹 표시명을 단과대 자리에 사용
   private static final String RANKING_ELIGIBLE_DEPARTMENT_3 = "국방디지털융합과";
   private static final String RANKING_ELIGIBLE_DEPARTMENT_DISPLAY_NAME_3 = "국방디지털융합학과";
+
+  // 스페셜 매치 (23/24/25/26 학번 4자 랭킹)
+  private static final String SPECIAL_MATCH_STORE = "경영인텔리빨사이에낀SPAGHETTL";
+  private static final List<int[]> SPECIAL_MATCH_STUDENT_RANGES =
+      List.of(
+          new int[] {STUDENT_NUM_MIN_23, STUDENT_NUM_MAX_23},
+          new int[] {STUDENT_NUM_MIN_24, STUDENT_NUM_MAX_24},
+          new int[] {STUDENT_NUM_MIN_25, STUDENT_NUM_MAX_25},
+          new int[] {STUDENT_NUM_MIN_26, STUDENT_NUM_MAX_26});
+  private static final List<String> SPECIAL_MATCH_STUDENT_LABELS =
+      List.of("23학번", "24학번", "25학번", "26학번");
 
   private final S3Service s3Service;
   private final OcrService ocrService;
@@ -224,6 +236,37 @@ public class ReceiptServiceImpl implements ReceiptService {
     return List.of(
         Week3ChallengeResponse.of("23학번", total23, "24학번", total24),
         Week3ChallengeResponse.of("25학번", total25, "26학번", total26));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<SpecialMatchRankingResponse> getSpecialMatchRanking() {
+    // 학번별 합산 (순서: 23, 24, 25, 26)
+    List<int[]> totalsWithIndex = new ArrayList<>();
+    for (int i = 0; i < SPECIAL_MATCH_STUDENT_RANGES.size(); i++) {
+      int[] range = SPECIAL_MATCH_STUDENT_RANGES.get(i);
+      int total =
+          receiptRepository.sumWeek3PaymentByStudentNumRange(
+              SPECIAL_MATCH_STORE, range[0], range[1]);
+      // [0] = 학번 인덱스(낮을수록 낮은 학번), [1] = 합산 금액
+      totalsWithIndex.add(new int[] {i, total});
+    }
+
+    // 금액 DESC, 동점이면 학번 인덱스 ASC(낮은 학번이 상위)
+    totalsWithIndex.sort(
+        Comparator.<int[]>comparingInt(arr -> arr[1])
+            .reversed()
+            .thenComparingInt(arr -> arr[0]));
+
+    List<SpecialMatchRankingResponse> rankings = new ArrayList<>();
+    for (int rank = 0; rank < totalsWithIndex.size(); rank++) {
+      int yearIndex = totalsWithIndex.get(rank)[0];
+      int total = totalsWithIndex.get(rank)[1];
+      rankings.add(
+          new SpecialMatchRankingResponse(
+              rank + 1, SPECIAL_MATCH_STUDENT_LABELS.get(yearIndex), total));
+    }
+    return rankings;
   }
 
   private Week2RankingGroupResponse buildGroup1Ranking() {

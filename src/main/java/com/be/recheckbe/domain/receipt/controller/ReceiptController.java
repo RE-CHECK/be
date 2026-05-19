@@ -3,6 +3,7 @@ package com.be.recheckbe.domain.receipt.controller;
 import com.be.recheckbe.domain.receipt.dto.AnalyzeReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.ConfirmReceiptRequest;
+import com.be.recheckbe.domain.receipt.dto.SpecialMatchRankingResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
@@ -83,6 +84,15 @@ public class ReceiptController {
           "3주차 학번 대진 결과를 조회합니다. (23학번 vs 24학번 / 25학번 vs 26학번) 금액이 높은 학번이 승리하며, 동점이면 무승부로 반환됩니다.")
   public BaseResponse<List<Week3ChallengeResponse>> getWeek3Challenge() {
     return BaseResponse.success(receiptService.getWeek3Challenge());
+  }
+
+  @GetMapping("/special-match")
+  @Operation(
+      summary = "스페셜 매치 학번 랭킹 조회",
+      description =
+          "3주차 영수증 중 지정 가게(경영인텔리빨사이에낀SPAGHETTL)에 대해 23~26학번의 결제금액 합산을 기준으로 1~4등 랭킹을 반환합니다. 동점 시 낮은 학번이 상위로 정렬됩니다.")
+  public BaseResponse<List<SpecialMatchRankingResponse>> getSpecialMatchRanking() {
+    return BaseResponse.success(receiptService.getSpecialMatchRanking());
   }
 
   @GetMapping("/weekly-college-ranking")

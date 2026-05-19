@@ -3,6 +3,7 @@ package com.be.recheckbe.domain.receipt.service;
 import com.be.recheckbe.domain.receipt.dto.AnalyzeReceiptResponse;
 import com.be.recheckbe.domain.receipt.dto.CollegeTotalPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.ConfirmReceiptRequest;
+import com.be.recheckbe.domain.receipt.dto.SpecialMatchRankingResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalAllPaymentResponse;
 import com.be.recheckbe.domain.receipt.dto.TotalParticipationResponse;
 import com.be.recheckbe.domain.receipt.dto.UploadReceiptResponse;
@@ -28,6 +29,8 @@ public interface ReceiptService {
   List<Week2RankingGroupResponse> getWeek2Ranking();
 
   List<Week3ChallengeResponse> getWeek3Challenge();
+
+  List<SpecialMatchRankingResponse> getSpecialMatchRanking();
 
   WeeklyRankingResponse getWeeklyCollegeRanking(Integer weekNumber);
 }
