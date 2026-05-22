@@ -50,15 +50,15 @@ public class ReceiptServiceImpl implements ReceiptService {
   // 3주차 대진
   private static final String CHALLENGE_STORE_NAME_23_24 = "소문난대구막창";
   private static final String CHALLENGE_STORE_NAME_25_26 = "사랑집"; // fixed
-  // 학번 범위 (앞 4자리가 입학년도, e.g. 23학번 = 2023_000_000 ~ 2023_999_999)
-  private static final int STUDENT_NUM_MIN_23 = 2023_000_000;
-  private static final int STUDENT_NUM_MAX_23 = 2023_999_999;
-  private static final int STUDENT_NUM_MIN_24 = 2024_000_000;
-  private static final int STUDENT_NUM_MAX_24 = 2024_999_999;
-  private static final int STUDENT_NUM_MIN_25 = 2025_000_000;
-  private static final int STUDENT_NUM_MAX_25 = 2025_999_999;
-  private static final int STUDENT_NUM_MIN_26 = 2026_000_000;
-  private static final int STUDENT_NUM_MAX_26 = 2026_999_999;
+  // 학번 범위 (9자리 학번, 앞 4자리가 입학년도, e.g. 23학번 = 202_300_000 ~ 202_399_999)
+  private static final int STUDENT_NUM_MIN_23 = 202_300_000;
+  private static final int STUDENT_NUM_MAX_23 = 202_399_999;
+  private static final int STUDENT_NUM_MIN_24 = 202_400_000;
+  private static final int STUDENT_NUM_MAX_24 = 202_499_999;
+  private static final int STUDENT_NUM_MIN_25 = 202_500_000;
+  private static final int STUDENT_NUM_MAX_25 = 202_599_999;
+  private static final int STUDENT_NUM_MIN_26 = 202_600_000;
+  private static final int STUDENT_NUM_MAX_26 = 202_699_999;
 
   // 대진 1: 아빠땡
   private static final String RANKING_STORE_NAME_1 = "아빠땡";
